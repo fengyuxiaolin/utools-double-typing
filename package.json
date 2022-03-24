@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "element-plus": "^2.1.4",
+    "pinyin": "^2.11.1",
     "sass": "^1.49.9",
     "vue": "^3.2.8"
   },
