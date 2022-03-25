@@ -18,17 +18,17 @@ export default defineConfig({
 		port: 3000
 	},
 	resolve: {
-	    alias: {
-	      '~/': `${pathSrc}/`,
-	    },
-	  },
-	  css: {
-	    preprocessorOptions: {
-	      scss: {
-	        additionalData: `@use "~/styles/element/index.scss" as *;`,
-	      },
-	    },
-	  },
+		alias: {
+			'~/': `${pathSrc}/`,
+		},
+	},
+	css: {
+		preprocessorOptions: {
+			scss: {
+				additionalData: `@use "~/styles/element/index.scss" as *;`,
+			},
+		},
+	},
 	plugins: [
 		vue(),
 		AutoImport({
@@ -36,7 +36,7 @@ export default defineConfig({
 		}),
 		Components({
 			resolvers: [ElementPlusResolver({
-				 importStyle: 'sass',
+				importStyle: 'sass',
 			})],
 		}),
 	]

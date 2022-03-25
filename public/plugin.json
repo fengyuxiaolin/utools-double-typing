@@ -1,15 +1,13 @@
 {
 	"main": "index.html",
-	"logo": "sh.png",
+	"logo": "logo.png",
+	"preload": "preload.js",
 	"development": {
 		"main": "http://127.0.0.1:3000"
 	},
-	"preload": "preload.js",
-	"features": [
-		{
-		  "code": "shungpin",
-		  "explain": "练习双拼打字",
-			"cmds":["双拼练习"]
-		}
-	]
+	"features": [{
+		"code": "shungpin",
+		"explain": "练习双拼打字",
+		"cmds": ["双拼练习"]
+	}]
 }
