@@ -1,11 +1,51 @@
 <template>
-	<el-header>header</el-header>
-
-	<el-main><HelloWorld /></el-main>
+	<el-header><component :is="settings" :configDb="configDb" :configPage="configPage"></component></el-header>
+	<keep-alive>
+		<transition name="slide-fade">
+			<el-main><component :is="main" :configDb="configDb" :configPage="configPage"></component></el-main>
+		</transition>
+	</keep-alive>
 </template>
 
-<script setup>
-import HelloWorld from './components/HelloWorld.vue';
+<script>
+import WordTyping from './components/WordTyping.vue';
+import TypingSettings from './components/TypingSettings.vue';
+
+export default {
+	data() {
+		return {
+			configDb: {},
+			configPage: {}
+		};
+	},
+	methods: {},
+	computed: {
+		settings() {
+			if (this.configDb.data) {
+				return 'TypingSettings';
+			}
+		},
+		main() {
+			return this.configDb.data?.settings?.typingWay;
+		}
+	},
+	components: {
+		WordTyping,
+		TypingSettings
+	},
+	mounted() {
+		// 等待utools挂载~
+		let waitReoad = setInterval(() => {
+			try {
+				this.configDb = getDtConfig();
+				clearInterval(waitReoad);
+				this.configPage = JSON.parse(JSON.stringify(this.configDb.data));
+			} catch (err) {
+				console.error(err);
+			}
+		}, 10);
+	}
+};
 </script>
 
 <style>
@@ -18,10 +58,15 @@ body {
 
 :root {
 	--backgroundColor: #eeeeee;
-	--boxBottom: 0px -2px 0px #0097a7 inset;
 	--fontColor: #141414;
-	--trueKeyBackColor: #bed5be;
+
+	--selectOptionBackColor: #ffffff;
+	--selectAddButtonBackColor: #e6f2e6;
+
+	--boxBottom: 0px -2px 0px #0097a7 inset;
 	--buttonBackColor: #d3dce6;
+	--trueKeyBackColor: #bed5be;
+	--pressKeyBackColor: #b3d6e3;
 	--keyMapShengColor: #12a9e0;
 	--buttonFontColor: #585a5f;
 }
@@ -30,7 +75,12 @@ body {
 	:root {
 		--backgroundColor: #333333;
 		--fontColor: #adadad;
+
+		--selectOptionBackColor: #424242;
+		--selectAddButtonBackColor: #424242;
+
 		--trueKeyBackColor: #415c41;
+		--pressKeyBackColor: #54523d;
 		--buttonBackColor: #333333;
 		--keyMapShengColor: #ad593a;
 		--buttonFontColor: #adadad;

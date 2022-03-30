@@ -2,7 +2,21 @@
  * 存储utools数据方法
  */
 window.putUtoolsDB = data => {
-	return utools.db.put(data);
+	return utools.db.put({
+		_id: data._id,
+		data: JSON.parse(JSON.stringify(data.data)),
+		_rev: data._rev
+	});
+}
+
+/**
+ * 更新数据
+ */
+window.updateUtoolsDB = data => {
+	const res = putUtoolsDB(data);
+	if (res.ok) {
+		data._rev = res.rev;
+	}
 }
 
 /**
@@ -21,5 +35,3 @@ window.getDtConfig = () => {
 	}
 	return dtconfig;
 }
-
-
