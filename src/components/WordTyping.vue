@@ -92,10 +92,15 @@ configPage = props.configPage;
 console.log(configPage);
 
 // 初始化页面
-initWordPage();
+if (configPage.settings.schemeName) {
+	initWordPage();
+} else {
+	initCreateSchemePage();
+}
 
-// 初始化页面
+// 初始化单字练习页面
 function initWordPage() {
+	// 获取设置信息
 	schemeName = configPage.settings.schemeName;
 	typingModel = configPage.settings.typingModel;
 
@@ -120,7 +125,7 @@ function initWordPage() {
 	// 设置变更时更新页面
 	watch(
 		() => configPage.settings,
-		(a, b) => {
+		(target, origin) => {
 			// 判断是否有变更(可能是由于使用了keep-alive, 存在多次触发watch的bug)
 			let realChange = configPage.settings.schemeName != schemeName;
 			realChange ||= configPage.settings.typingModel != typingModel;
@@ -136,6 +141,41 @@ function initWordPage() {
 			}
 		},
 		{ deep: true }
+	);
+}
+
+// 初始化创建方案页面
+function initCreateSchemePage() {
+	// 获取设置信息
+	schemeName = configPage.settings.schemeName;
+	typingModel = configPage.settings.typingModel;
+	// 初始化键位图
+	initKeyMap();
+	if (schemeName) {
+		// 加载双拼方案
+		getScheme();
+
+		// 以当前方案填充键位图
+		fillKeyMap();
+	}
+	watch(
+		() => configPage.settings.schemeName,
+		() => {
+			// 判断是否有变更
+			let realChange = configPage.settings.schemeName != schemeName;
+				console.log("变更方案: ", configPage.settings.typingModel);
+			if (realChange) {
+				// 重新加载页面
+				initCreateSchemePage();
+			}
+		}
+	);
+	watch(() => configPage.schemes,
+		() => {
+			console.log(configPage.schemes);
+			initCreateSchemePage();
+		},
+		{deep: true}
 	);
 }
 

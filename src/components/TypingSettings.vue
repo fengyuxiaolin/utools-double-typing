@@ -27,14 +27,14 @@
 <script setup>
 // 获取父组件传入的值
 const props = defineProps(['configPage', 'configPage']);
+const emit = defineEmits(['addNewScheme']);
 
 const configPage = props.configPage, // 设置
-	schemeGroups = configPage.schemeGroups; // 方案分组信息
+	schemeGroups = configPage.schemeGroups // 方案分组信息
 
 console.log('typingSettings: ', configPage);
-
 function addNewScheme(){
-	
+	emit('addNewScheme');
 }
 </script>
 

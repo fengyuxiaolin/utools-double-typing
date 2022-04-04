@@ -1,10 +1,13 @@
 <template>
-	<el-header><component :is="settings" :configDb="configDb" :configPage="configPage"></component></el-header>
-	<keep-alive>
-		<transition name="slide-fade">
-			<el-main><component :is="main" :configDb="configDb" :configPage="configPage"></component></el-main>
-		</transition>
-	</keep-alive>
+	<el-header><component :is="settings" :configDb="configDb" :configPage="configPage" @addNewScheme="createScheme"></component></el-header>
+	<transition name="slide-fade">
+		<el-main><component :is="main" :configDb="configDb" :configPage="configPage"></component></el-main>
+	</transition>
+	<el-dialog v-model="addNewScheme" title="自定义方案" width="720px" draggable>
+		<NewSchemeForm :configPage="newSchemeConfig" :configDb="configDb" @addNewScheme="offAddNewScheme" />
+		<WordTyping :configPage="newSchemeConfig" />
+		<span class="tips">tips:&nbsp;请为每个音节设置对应按键, 不设置会自动尝试绑定对应按键, 不建议设置过于复杂的方案</span>
+	</el-dialog>
 </template>
 
 <script>
@@ -15,10 +18,27 @@ export default {
 	data() {
 		return {
 			configDb: {},
-			configPage: {}
+			configPage: {},
+			newSchemeConfig: {},
+			addNewScheme: false
 		};
 	},
-	methods: {},
+	methods: {
+		offAddNewScheme(val) {
+			console.log(val);
+			this.configPage = JSON.parse(JSON.stringify(this.configDb.data));
+			let tv = this.configDb.data?.settings?.typingWay;
+			this.configDb.data.settings.typingWay = '';
+			setTimeout(() => {this.configDb.data.settings.typingWay = tv}, 1)
+			
+			this.addNewScheme = false;
+		},
+		createScheme() {
+			this.newSchemeConfig = JSON.parse(JSON.stringify(this.configDb.data));
+			this.newSchemeConfig.settings.schemeName = '';
+			this.addNewScheme = true;
+		}
+	},
 	computed: {
 		settings() {
 			if (this.configDb.data) {
@@ -29,6 +49,7 @@ export default {
 			return this.configDb.data?.settings?.typingWay;
 		}
 	},
+	watch: {},
 	components: {
 		WordTyping,
 		TypingSettings
@@ -69,6 +90,8 @@ body {
 	--pressKeyBackColor: #b3d6e3;
 	--keyMapShengColor: #12a9e0;
 	--buttonFontColor: #585a5f;
+
+	--resetButtonBackColor: #f8f8f8;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -100,5 +123,26 @@ body {
 .el-header {
 	display: flex;
 	justify-content: center;
+}
+
+.el-dialog {
+	margin: 3% auto;
+}
+.el-dialog__header,
+.el-dialog__body,
+.el-dialog__headerbtn {
+	background-color: var(--backgroundColor);
+}
+.el-dialog__header {
+	margin: 0;
+}
+.el-dialog__title {
+	color: var(--fontColor);
+}
+.tips {
+	font-size: 12px;
+	position: absolute;
+	bottom: 4px;
+	left: 10px;
 }
 </style>
