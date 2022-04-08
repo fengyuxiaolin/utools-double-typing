@@ -37,6 +37,7 @@
 					<span v-for="yun in key.yun" :key="yun" class="keyMapYun">{{ yun }}</span>
 				</p>
 			</el-button>
+			<el-button style="width: 0; padding: 0; border: none;" v-else-if="key.key == ''"></el-button>
 			<el-button class="bg-purple" v-else>
 				<p>
 					<span class="keyMapKey" :value="key.key">{{ key.key }}</span>
@@ -72,6 +73,8 @@ let configDb, // utools数据库中的配置信息
 	zeroKeyArr = [], // 零声母
 	nowZeroScheme = ref({}), // 当前零声母方案
 	keyboardMap = ref(), // 键位
+	keyMapShengKey = {}, // 当前键位图提示声母
+	keyMapYunKey = {}, // 牵挂的键位图提示的韵母
 	dict = ref(), // 文字
 	pinyinList, // 当前文字的所有拼音
 	nowPinyin = ref(), // 展示的拼音
@@ -80,7 +83,7 @@ let configDb, // utools数据库中的配置信息
 	wordProgress = 0; // 单字练习进度
 
 const ZERO_KEY = [['a', 'ai', 'an', 'ang', 'ao'], ['e', 'ei', 'en', 'eng', 'er'], ['o', 'ou']],
-	KEYBOARD_KEY_ARR = [['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'], ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';'], ['Z', 'X', 'C', 'V', 'B', 'N', 'M']],
+	KEYBOARD_KEY_ARR = [['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'], ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';'], ['Z', 'X', 'C', 'V', 'B', 'N', 'M', '']],
 	KEYBOARD_KEY = ['qwertyuiop', 'asdfghjkl;', 'zxcvbnm'];
 
 zeroKeyArr = ZERO_KEY.flat();
@@ -163,19 +166,20 @@ function initCreateSchemePage() {
 		() => {
 			// 判断是否有变更
 			let realChange = configPage.settings.schemeName != schemeName;
-				console.log("变更方案: ", configPage.settings.typingModel);
+			console.log('变更方案: ', configPage.settings.typingModel);
 			if (realChange) {
 				// 重新加载页面
 				initCreateSchemePage();
 			}
 		}
 	);
-	watch(() => configPage.schemes,
+	watch(
+		() => configPage.schemes,
 		() => {
 			console.log(configPage.schemes);
 			initCreateSchemePage();
 		},
-		{deep: true}
+		{ deep: true }
 	);
 }
 
@@ -258,12 +262,9 @@ function getDoubleKeyList() {
 			yun = '';
 		if ('aeo'.indexOf(first) != -1) {
 			yun = nowScheme.zero.get(pinyin);
-		} else if ('scz'.indexOf(first) != -1) {
-			let second = pinyin.slice(0, 2);
-			if (second.indexOf('h') != -1) {
-				sheng = nowScheme.sheng.get(second);
-				yun = nowScheme.yun.get(pinyin.slice(2));
-			}
+		} else if ('scz'.indexOf(first) != -1 && pinyin.slice(0, 2).indexOf('h') != -1) {
+			sheng = nowScheme.sheng.get(pinyin.slice(0, 2));
+			yun = nowScheme.yun.get(pinyin.slice(2));
 		} else {
 			sheng = nowScheme.sheng.get(first);
 			yun = nowScheme.yun.get(pinyin.slice(1));
@@ -273,28 +274,42 @@ function getDoubleKeyList() {
 }
 
 // 展示键位提示
-function showKeysTip() {
-	let doubleKey = '';
-	try {
-		nowDoubleKeyList.forEach(dk => {
-			doubleKey = dk;
-			throw new Error();
-		});
-	} catch {}
+function showKeysTip(sp) {
+	keyMapShengKey.isNextTrueKey = false;
+	keyMapYunKey.isTrueKey = false;
+	let doubleKey = sp;
+	if (!doubleKey) {
+		try {
+			// 只需要提示第一个双拼方案
+			nowDoubleKeyList.forEach(dk => {
+				doubleKey = dk;
+				throw new Error();
+			});
+		} catch {}
+	}
+	console.log(doubleKey);
 	let nextTrueKey = doubleKey[0],
 		trueKey = doubleKey[1];
 	// 第一个键
 	keyboardForEach(nextTrueKey, keyMapValue => {
+		keyMapShengKey = keyMapValue;
 		keyMapValue.isNextTrueKey = true;
 	});
 	keyboardForEach(trueKey, keyMapValue => {
+		keyMapYunKey = keyMapValue;
 		keyMapValue.isTrueKey = true;
 	});
 
 	// 零声母
 	let zeroKeyIndex = zeroKeyArr.indexOf(nowPinyin.value);
 	if (zeroKeyIndex != -1) {
-		document.getElementsByClassName('zeroKeyBox')[zeroKeyIndex].classList.add('isNextTrueKey');
+		if (document.getElementsByClassName('zeroKeyBox').length == 0) {
+			setTimeout(() => {
+				document.getElementsByClassName('zeroKeyBox')[zeroKeyIndex].classList.add('isNextTrueKey');
+			}, 0);
+		} else {
+			document.getElementsByClassName('zeroKeyBox')[zeroKeyIndex].classList.add('isNextTrueKey');
+		}
 	}
 }
 
@@ -329,6 +344,14 @@ function keyup(val) {
 
 // 检测单字输入
 function onWordTyping(val) {
+	// 输入1个字母后判断声母, 矫正键位提示
+	if (val.length == 1) {
+		nowDoubleKeyList.forEach(sp => {
+			if (sp[0] == val) {
+				showKeysTip(sp);
+			}
+		});
+	}
 	// 输入2个字母后判断
 	if (val.length == 2) {
 		if (nowDoubleKeyList.has(val)) {
@@ -342,12 +365,8 @@ function onWordTyping(val) {
 			getDoubleKeyList();
 			let nextTrueKey = val[0],
 				trueKey = val[1];
-			keyboardForEach(nextTrueKey, keyMapValue => {
-				keyMapValue.isNextTrueKey = false;
-			});
-			keyboardForEach(trueKey, keyMapValue => {
-				keyMapValue.isTrueKey = false;
-			});
+			keyMapShengKey.isNextTrueKey = false;
+			keyMapYunKey.isTrueKey = false;
 			showKeysTip();
 		}
 		// 清空输入框
@@ -410,10 +429,13 @@ function onWordTyping(val) {
 	right: 3%;
 }
 .key-map-row[value='1'] {
-	padding-left: 43px;
+	padding-left: 36px;
 }
 .key-map-row[value='2'] {
 	margin-bottom: 20px;
+}
+.key-map-row .el-button[value=''] {
+	width: 0;
 }
 .keyMapKey {
 	font-size: 18px;

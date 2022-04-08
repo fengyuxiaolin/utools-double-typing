@@ -1,4 +1,6 @@
-import { createApp } from 'vue'
+import {
+	createApp
+} from 'vue'
 import App from './App.vue'
 import pinyin from 'pinyin';
 /**
@@ -15,10 +17,28 @@ window.toPinyin = (hanzi, option) => {
  * @param {String} hanzi
  */
 window.toPinyinNormal = hanzi => {
-	// throw new Error("nima")
-	return pinyin(hanzi, {
+	if(hanzi === '哦'){
+		return [['o', 'e']]
+	}else if(hanzi === '嘚'){
+		return [['dei', 'de']]
+	}
+	let pyList = pinyin(hanzi, {
 		style: pinyin.STYLE_NORMAL,
 		heteronym: true
 	})
+	pyList.forEach((pys) => {
+		pys.forEach((py, i) => {
+			if(py === 'n'){
+				pys[i] = 'en'
+			}
+			if(py === 'ng'){
+				pys[i] = 'eng'
+			}
+		})
+	})
+	return pyList;
+}
+window.compare = (hanzi1, hanzi2) => {
+	return pinyin.compare(hanzi1, hanzi2);
 }
 createApp(App).mount('#app')
