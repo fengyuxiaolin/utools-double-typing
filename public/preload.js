@@ -35,3 +35,16 @@ window.getDtConfig = () => {
 	}
 	return dtconfig;
 }
+
+// 声明常量 短文id前缀
+const ARTICLE_ID_PREFIX = "article_";
+
+/**
+ * 获取所有短文
+ */
+window.getAllArticle = () => {
+	let articles = utools.db.getAllDocs(ARTICLE_ID_PREFIX, {
+		include_docs: true
+	});
+	return articles;
+}
