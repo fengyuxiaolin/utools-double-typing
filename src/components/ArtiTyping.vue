@@ -27,8 +27,10 @@ import { ref } from "vue";
 // 获取父组件传入的值
 const props = defineProps(["configDb", "configPage"]);
 // 声明页面所需的变量
-let allArticleBox = ref(false), // 所有短文抽屉开关
-    allArticleList = ref([]); // 所有短文列表
+let configDb = props.configDb, // 数据库
+  configPage = ref(props.configPage), // 页面设置
+  allArticleBox = ref(false), // 所有短文抽屉开关
+  allArticleList = ref([]); // 所有短文列表
 
 // 打开左侧抽屉
 function openAllArticleBox() {
@@ -46,7 +48,6 @@ function load() {
   const newArticleList = configPage.allArticleList.slice(start, end);
   allArticleList.value = allArticleList.value.concat(newArticleList);
 }
-
 </script>
 
 <style scope>
@@ -66,7 +67,8 @@ function load() {
   background-color: var(--resetButtonBackColor);
 }
 /* 提示框颜色 */
-.el-popper.is-customized, .el-popper.is-customized .el-popper__arrow::before {
+.el-popper.is-customized,
+.el-popper.is-customized .el-popper__arrow::before {
   background-color: var(--resetButtonBackColor);
 }
 </style>

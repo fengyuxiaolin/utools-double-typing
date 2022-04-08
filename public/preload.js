@@ -23,7 +23,6 @@ window.updateUtoolsDB = data => {
  * 获取配置信息,如果不存在则进行初始化
  */
 window.getDtConfig = () => {
-	utools.db.remove("dtconfig");
 	let dtconfig = utools.db.get("dtconfig");
 	if (dtconfig === null) {
 		// 读取配置文件
@@ -36,15 +35,40 @@ window.getDtConfig = () => {
 	return dtconfig;
 }
 
+/**
+ * 根据id获取数据
+ */
+window.getDataById = (id) => {
+	let data = utools.db.get(id);
+	if (data === null) {
+		// 尝试初始化数据
+		try {
+			data = require(`./data/${id}.json`);
+			let i = window.putUtoolsDB({
+				_id: id,
+				data: data
+			});
+			console.log('i: ', i);
+			data = utools.db.get(id);
+			console.log('data: ', data);
+			return data;
+		} catch (error) {
+			return null;
+		}
+	}
+	return data;
+}
+
 // 声明常量 短文id前缀
 const ARTICLE_ID_PREFIX = "article_";
 
-/**
- * 获取所有短文
+/** 
+ * 利用时间戳生成文章id
  */
-window.getAllArticle = () => {
-	let articles = utools.db.getAllDocs(ARTICLE_ID_PREFIX, {
-		include_docs: true
-	});
-	return articles;
+let generateArticleId = () => {
+	let date = new Date();
+	let timestamp = date.getTime();
+	return ARTICLE_ID_PREFIX + timestamp;
 }
+
+

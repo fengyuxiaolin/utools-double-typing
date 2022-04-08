@@ -33,7 +33,7 @@
 
 <script>
 import WordTyping from "./components/WordTyping.vue";
-import ArtiTyping from './components/ArtiTyping.vue';
+import ArtiTyping from "./components/ArtiTyping.vue";
 import TypingSettings from "./components/TypingSettings.vue";
 
 export default {
@@ -83,7 +83,7 @@ export default {
   components: {
     WordTyping,
     TypingSettings,
-	ArtiTyping
+    ArtiTyping,
   },
   mounted() {
     // 等待utools挂载~
@@ -92,6 +92,7 @@ export default {
         this.configDb = getDtConfig();
         clearInterval(waitReoad);
         this.configPage = JSON.parse(JSON.stringify(this.configDb.data));
+        console.log("article_1: ", getDataById("article_1"));
       } catch (err) {
         console.error(err);
       }
