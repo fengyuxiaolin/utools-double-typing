@@ -21,7 +21,11 @@
     :value="i"
   >
     <el-col v-for="key in row" :key="key" :span="2">
-      <el-button class="isNowPress isNextTrueKey" v-if="key.isNowPress">
+      <el-button
+        class="isNowPress isNextTrueKey"
+        @click="enterAKey(key.key)"
+        v-if="key.isNowPress"
+      >
         <p>
           <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
 
@@ -34,7 +38,11 @@
           }}</span>
         </p>
       </el-button>
-      <el-button class="isNextTrueKey" v-else-if="key.isNextTrueKey">
+      <el-button
+        class="isNextTrueKey"
+        @click="enterAKey(key.key)"
+        v-else-if="key.isNextTrueKey"
+      >
         <p>
           <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
           <span class="keyMapSheng">{{ key.sheng }}</span>
@@ -45,7 +53,11 @@
           }}</span>
         </p>
       </el-button>
-      <el-button class="isTrueKey" v-else-if="key.isTrueKey">
+      <el-button
+        class="isTrueKey"
+        @click="enterAKey(key.key)"
+        v-else-if="key.isTrueKey"
+      >
         <p>
           <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
           <span class="keyMapSheng">{{ key.sheng }}</span>
@@ -60,7 +72,7 @@
         style="width: 0; padding: 0; border: none"
         v-else-if="key.key == ''"
       ></el-button>
-      <el-button class="bg-purple" v-else>
+      <el-button class="bg-purple" @click="enterAKey(key.key)" v-else>
         <p>
           <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
           <span class="keyMapSheng">{{ key.sheng }}</span>
@@ -83,6 +95,7 @@
       </el-button>
     </el-col>
   </el-row>
+  <contextmenu :contextList="contextList" @selectItem="selectContext" />
 </template>
 
 <script setup>
@@ -104,7 +117,8 @@ let configDb, // utools数据库中的配置信息
   nowPinyin = ref(), // 展示的拼音
   nowDoubleKeyList = new Set(), // 当前方案下当前文字所有拼音对应的双拼
   typing = ref(), // 输入内容
-  wordProgress = 0; // 单字练习进度
+  wordProgress = 0, // 单字练习进度
+  contextList = ref([]); // 右键菜单内容
 
 const ZERO_KEY = [
     ["a", "ai", "an", "ang", "ao"],
@@ -161,7 +175,7 @@ function initWordPage() {
   watch(
     () => configPage.settings,
     (target, origin) => {
-      // 判断是否有变更(可能是由于使用了keep-alive, 存在多次触发watch的bug)
+      // 判断是否有变更(存在多次触发watch的bug)
       let realChange = configPage.settings.schemeName != schemeName;
       realChange ||= configPage.settings.typingModel != typingModel;
       if (realChange) {
@@ -180,6 +194,14 @@ function initWordPage() {
     { deep: true }
   );
 }
+
+// 设置右键菜单内容
+contextList.value = [
+  {
+    label: "导出键位图",
+    click: exportKeyMap,
+  },
+];
 
 // 初始化创建方案页面
 function initCreateSchemePage() {
@@ -383,6 +405,21 @@ function keyup(val) {
   });
 }
 
+// 键位图的按键点击事件, 将按键的key输入到输入框
+function enterAKey(keyMapValue) {
+  // 如果传入的不在按键列表中，则返回
+  if (!keyMapValue.toLowerCase) {
+    return;
+  }
+  // 获取输入框
+  let typingInput = document.querySelectorAll(".typing .el-input__inner")[0];
+  console.log("typing: ", typingInput);
+  // 将按键输入到输入框
+  typingInput.value += keyMapValue.toLowerCase();
+  // 触发输入框的 input 事件
+  typingInput.dispatchEvent(new Event("input"));
+}
+
 // 检测单字输入
 function onWordTyping(val) {
   // 输入1个字母后判断声母, 矫正键位提示
@@ -414,6 +451,15 @@ function onWordTyping(val) {
     // 清空输入框
     typing.value = "";
   }
+}
+
+// 执行选中的右键菜单回调
+function selectContext(cb) {
+  cb();
+}
+// 导出键位图
+function exportKeyMap() {
+  console.log("已导出键位图");
 }
 </script>
 
