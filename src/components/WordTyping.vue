@@ -14,92 +14,95 @@
       ></el-input>
     </el-container>
   </el-space>
-  <el-row
-    v-for="(row, i) in keyboardMap"
-    :key="i"
-    class="key-map-row"
-    :value="i"
-  >
-    <el-col v-for="key in row" :key="key" :span="2">
-      <el-button
-        class="isNowPress isNextTrueKey"
-        @click="enterAKey(key.key)"
-        v-if="key.isNowPress"
-      >
-        <p>
-          <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
+  <div id="keyboardMapBox">
+    <el-row
+      v-for="(row, i) in keyboardMap"
+      :key="i"
+      class="key-map-row"
+      :value="i"
+    >
+      <el-col v-for="key in row" :key="key" :span="2">
+        <el-button
+          class="isNowPress isNextTrueKey"
+          @click="enterAKey(key.key)"
+          v-if="key.isNowPress"
+        >
+          <p>
+            <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
 
-          <span class="keyMapSheng">{{ key.sheng }}</span>
-        </p>
+            <span class="keyMapSheng">{{ key.sheng }}</span>
+          </p>
 
-        <p class="keyMapYunBox">
-          <span v-for="yun in key.yun" :key="yun" class="keyMapYun">{{
-            yun
-          }}</span>
-        </p>
-      </el-button>
-      <el-button
-        class="isNextTrueKey"
-        @click="enterAKey(key.key)"
-        v-else-if="key.isNextTrueKey"
-      >
-        <p>
-          <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
-          <span class="keyMapSheng">{{ key.sheng }}</span>
-        </p>
-        <p class="keyMapYunBox">
-          <span v-for="yun in key.yun" :key="yun" class="keyMapYun">{{
-            yun
-          }}</span>
-        </p>
-      </el-button>
-      <el-button
-        class="isTrueKey"
-        @click="enterAKey(key.key)"
-        v-else-if="key.isTrueKey"
-      >
-        <p>
-          <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
-          <span class="keyMapSheng">{{ key.sheng }}</span>
-        </p>
-        <p class="keyMapYunBox">
-          <span v-for="yun in key.yun" :key="yun" class="keyMapYun">{{
-            yun
-          }}</span>
-        </p>
-      </el-button>
-      <el-button
-        style="width: 0; padding: 0; border: none"
-        v-else-if="key.key == ''"
-      ></el-button>
-      <el-button class="bg-purple" @click="enterAKey(key.key)" v-else>
-        <p>
-          <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
-          <span class="keyMapSheng">{{ key.sheng }}</span>
-        </p>
-        <p class="keyMapYunBox">
-          <span v-for="yun in key.yun" :key="yun" class="keyMapYun">{{
-            yun
-          }}</span>
-        </p>
-      </el-button>
-    </el-col>
-  </el-row>
-  <el-row class="zeroKeyMap" v-for="keys in ZERO_KEY" :key="keys">
-    <el-col :span="7"></el-col>
-    <el-col :span="2" v-for="(key, i) in keys" :key="i">
-      <el-button class="zeroKeyBox">
-        <span class="zeroKey" v-if="i == 0">{{ key }} &nbsp;</span>
-        <span class="zeroKey" v-else>{{ key }}</span>
-        <span class="zeroKeyBoard">{{ nowZeroScheme[key] }}</span>
-      </el-button>
-    </el-col>
-  </el-row>
+          <p class="keyMapYunBox">
+            <span v-for="yun in key.yun" :key="yun" class="keyMapYun">{{
+              yun
+            }}</span>
+          </p>
+        </el-button>
+        <el-button
+          class="isNextTrueKey"
+          @click="enterAKey(key.key)"
+          v-else-if="key.isNextTrueKey"
+        >
+          <p>
+            <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
+            <span class="keyMapSheng">{{ key.sheng }}</span>
+          </p>
+          <p class="keyMapYunBox">
+            <span v-for="yun in key.yun" :key="yun" class="keyMapYun">{{
+              yun
+            }}</span>
+          </p>
+        </el-button>
+        <el-button
+          class="isTrueKey"
+          @click="enterAKey(key.key)"
+          v-else-if="key.isTrueKey"
+        >
+          <p>
+            <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
+            <span class="keyMapSheng">{{ key.sheng }}</span>
+          </p>
+          <p class="keyMapYunBox">
+            <span v-for="yun in key.yun" :key="yun" class="keyMapYun">{{
+              yun
+            }}</span>
+          </p>
+        </el-button>
+        <el-button
+          style="width: 0; padding: 0; border: none"
+          v-else-if="key.key == ''"
+        ></el-button>
+        <el-button class="bg-purple" @click="enterAKey(key.key)" v-else>
+          <p>
+            <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
+            <span class="keyMapSheng">{{ key.sheng }}</span>
+          </p>
+          <p class="keyMapYunBox">
+            <span v-for="yun in key.yun" :key="yun" class="keyMapYun">{{
+              yun
+            }}</span>
+          </p>
+        </el-button>
+      </el-col>
+    </el-row>
+    <el-row class="zeroKeyMap" v-for="keys in ZERO_KEY" :key="keys">
+      <el-col :span="7"></el-col>
+      <el-col :span="2" v-for="(key, i) in keys" :key="i">
+        <el-button class="zeroKeyBox">
+          <span class="zeroKey" v-if="i == 0">{{ key }} &nbsp;</span>
+          <span class="zeroKey" v-else>{{ key }}</span>
+          <span class="zeroKeyBoard">{{ nowZeroScheme[key] }}</span>
+        </el-button>
+      </el-col>
+    </el-row>
+  </div>
   <contextmenu :contextList="contextList" @selectItem="selectContext" />
 </template>
 
 <script setup>
 import { ref, watch } from "vue";
+import html2canvas from "html2canvas";
 
 let configDb, // utools数据库中的配置信息
   configPage, // 页面的配置信息
@@ -459,7 +462,27 @@ function selectContext(cb) {
 }
 // 导出键位图
 function exportKeyMap() {
-  console.log("已导出键位图");
+  console.log("keyboardMapBox: ", document.querySelector("#keyboardMapBox"));
+  html2canvas(document.querySelector("#keyboardMapBox")).then((canvas) => {
+    // 从页面设置中获取当前方案名称
+    const fileName = `${configPage.settings.schemeName}-键位图.png`;
+    // 将canvas转为图片并下载
+    // 打开文件保存窗口
+    const filePath = showSaveDialog({
+      title: "导出键位图",
+      defaultPath: utools.getPath("downloads") + "/" + fileName,
+      buttonLabel: "导出",
+    });
+    // 将 canvas 转为 Buffer
+    const buffer = convertCanvasToBuffer(canvas);
+    // 将buffer对象写入文件
+    try {
+      saveFile(filePath, buffer);
+      throw new Error("导出成功");
+    } catch {
+      utools.showNotification("导出失败");
+    }
+  });
 }
 </script>
 
