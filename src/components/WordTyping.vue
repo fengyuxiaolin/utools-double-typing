@@ -183,12 +183,14 @@ function initWordPage() {
       realChange ||= configPage.settings.typingModel != typingModel;
       if (realChange) {
         // 移除当前零声母提示
-        let zeroKeyIndex = zeroKeyArr.indexOf(nowPinyin.value);
-        if (zeroKeyIndex != -1) {
-          document
-            .getElementsByClassName("zeroKeyBox")
-            [zeroKeyIndex].classList.remove("isNextTrueKey");
-        }
+        setTimeout(() => {
+          let zeroKeyIndex = zeroKeyArr.indexOf(nowPinyin.value);
+          if (zeroKeyIndex != -1) {
+            document
+              .getElementsByClassName("zeroKeyBox")
+              [zeroKeyIndex].classList.remove("isNextTrueKey");
+          }
+        }, 0);
         console.log(configPage.settings.typingModel);
         // 重新加载页面
         initWordPage();
@@ -473,6 +475,8 @@ function exportKeyMap() {
       defaultPath: utools.getPath("downloads") + "/" + fileName,
       buttonLabel: "导出",
     });
+    // 如果没有选择文件保存路径，则返回
+    if (!filePath) return;
     // 将 canvas 转为 Buffer
     const buffer = convertCanvasToBuffer(canvas);
     // 将buffer对象写入文件
