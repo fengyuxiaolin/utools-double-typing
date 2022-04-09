@@ -159,6 +159,9 @@ function initWordPage() {
   // 初始化键位图
   initKeyMap();
 
+  // 初始化右键菜单
+  initContextMenu();
+
   // 加载双拼方案
   getScheme();
 
@@ -200,13 +203,19 @@ function initWordPage() {
   );
 }
 
-// 设置右键菜单内容
-contextList.value = [
-  {
-    label: "导出键位图",
-    click: exportKeyMap,
-  },
-];
+// 初始化右键菜单内容
+function initContextMenu() {
+  contextList.value = [
+    {
+      label: "导出键位图",
+      click: exportKeyMap,
+    },
+    {
+      label: "保存页面设置",
+      click: savePageSettings,
+    },
+  ];
+}
 
 // 初始化创建方案页面
 function initCreateSchemePage() {
@@ -487,6 +496,13 @@ function exportKeyMap() {
       utools.showNotification("导出失败");
     }
   });
+}
+
+// 保存页面设置
+function savePageSettings() {
+  configDb.data.settings = configPage.settings;
+  // 保存页面设置
+  updateUtoolsDB(configDb);
 }
 </script>
 

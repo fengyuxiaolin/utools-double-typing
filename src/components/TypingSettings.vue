@@ -1,43 +1,25 @@
 <template>
   <el-row :gutter="2">
     <el-col :span="4">
-      <el-select
-        placeholder="双拼方案"
-        :teleported="false"
-        popper-class="schemeSelect"
-        v-model="configPage.settings.schemeName"
-      >
+      <el-select placeholder="双拼方案" :teleported="false" popper-class="schemeSelect"
+        v-model="configPage.settings.schemeName">
         <el-button @click="addNewScheme">添加新方案</el-button>
         <el-divider border-style="dashed" />
-        <el-option-group
-          v-for="schemeGroup in schemeGroups"
-          :key="schemeGroup"
-          :label="schemeGroup.groupName"
-        >
-          <el-option
-            v-for="scheme in schemeGroup.schemeList"
-            :key="scheme"
-            :label="scheme"
-            :value="scheme"
-          />
+        <el-option-group v-for="schemeGroup in schemeGroups" :key="schemeGroup" :label="schemeGroup.groupName">
+          <el-option v-for="scheme in schemeGroup.schemeList" :key="scheme" :label="scheme" :value="scheme" />
         </el-option-group>
       </el-select>
     </el-col>
     <el-col :span="4">
-      <el-select
-        placeholder="练习模式"
-        :teleported="false"
-        popper-class="schemeSelect"
-        v-model="configPage.settings.typingModel"
-        @change="typingWayChange"
-      >
+      <el-select placeholder="练习模式" :teleported="false" popper-class="schemeSelect"
+        v-model="configPage.settings.typingModel" @change="typingWayChange">
         <el-option-group label="单字练习">
           <el-option label="顺序练习" value="wordOrder" />
           <el-option label="随机练习" value="wordRandom" />
         </el-option-group>
         <el-option-group label="短文练习">
-          <el-option label="双拼输入" value="doubleTyping"/>
-          <el-option label="中文输入" value="chineseTyping" disabled />
+          <el-option label="中文输入" value="chineseTyping" />
+          <el-option label="双拼输入" value="doubleTyping" disabled />
         </el-option-group>
       </el-select>
     </el-col>
@@ -53,11 +35,11 @@ const configPage = props.configPage, // 设置
   schemeGroups = configPage.schemeGroups; // 方案分组信息
 
 console.log("typingSettings: ", configPage);
-function addNewScheme() {
+function addNewScheme () {
   emit("addNewScheme");
 }
 // 练习模式改变时, 如果是短文练习, 则切打字页面为短文练习, 如果是单字练习, 则切打字页面为单字练习
-function typingWayChange() {
+function typingWayChange () {
   if (
     configPage.settings.typingModel === "wordOrder" ||
     configPage.settings.typingModel === "wordRandom"
@@ -83,6 +65,7 @@ function typingWayChange() {
   background-color: var(--selectOptionBackColor);
 }
 .el-select:deep(.el-input__inner) {
+  color: var(--fontColor);
   text-align: right;
   box-shadow: none;
 }
@@ -92,6 +75,12 @@ function typingWayChange() {
   background-color: var(--selectOptionBackColor);
   border: none;
   color: #00b6c9;
+}
+.el-select-dropdown__item {
+  color: var(--fontColor);
+}
+.el-select-dropdown__item.selected {
+  color: var(--el-color-success);
 }
 .el-scrollbar .el-button:hover {
   color: #0097a7;

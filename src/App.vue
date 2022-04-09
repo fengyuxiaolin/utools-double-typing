@@ -1,33 +1,18 @@
 <template>
-  <el-header
-    ><component
-      :is="settings"
-      :configDb="configDb"
-      :configPage="configPage"
-      @addNewScheme="createScheme"
-      @changePage="changePage"
-    ></component
-  ></el-header>
+  <el-header>
+    <component :is="settings" :configDb="configDb" :configPage="configPage" @addNewScheme="createScheme"
+      @changePage="changePage"></component>
+  </el-header>
   <transition name="slide-fade">
-    <el-main
-      ><component
-        :is="main"
-        :configDb="configDb"
-        :configPage="configPage"
-      ></component
-    ></el-main>
+    <el-main>
+      <component :is="main" :configDb="configDb" :configPage="configPage"></component>
+    </el-main>
   </transition>
   <el-dialog v-model="addNewScheme" title="自定义方案" width="720px" draggable>
-    <NewSchemeForm
-      :configPage="newSchemeConfig"
-      :configDb="configDb"
-      @addNewScheme="offAddNewScheme"
-    />
+    <NewSchemeForm :configPage="newSchemeConfig" :configDb="configDb" @addNewScheme="offAddNewScheme" />
     <WordTyping :configPage="newSchemeConfig" />
-    <span class="tips"
-      >tips:&nbsp;请为每个音节设置对应按键, 不设置会自动尝试绑定对应按键,
-      不建议设置过于复杂的方案</span
-    >
+    <span class="tips">tips:&nbsp;请为每个音节设置对应按键, 不设置会自动尝试绑定对应按键,
+      不建议设置过于复杂的方案</span>
   </el-dialog>
 </template>
 
@@ -37,7 +22,7 @@ import ArtiTyping from "./components/ArtiTyping.vue";
 import TypingSettings from "./components/TypingSettings.vue";
 
 export default {
-  data() {
+  data () {
     return {
       configDb: {},
       configPage: {},
@@ -47,11 +32,11 @@ export default {
   },
   methods: {
     // 切换打字页面的方法
-    changePage(page) {
+    changePage (page) {
       this.configDb.data.settings.typingWay = page;
     },
     // 关闭新建方案的弹窗
-    offAddNewScheme(val) {
+    offAddNewScheme (val) {
       console.log(val);
       this.configPage = JSON.parse(JSON.stringify(this.configDb.data));
       let tv = this.configDb.data?.settings?.typingWay;
@@ -63,19 +48,19 @@ export default {
       this.addNewScheme = false;
     },
     // 新建方案
-    createScheme() {
+    createScheme () {
       this.newSchemeConfig = JSON.parse(JSON.stringify(this.configDb.data));
       this.newSchemeConfig.settings.schemeName = "";
       this.addNewScheme = true;
     },
   },
   computed: {
-    settings() {
+    settings () {
       if (this.configDb.data) {
         return "TypingSettings";
       }
     },
-    main() {
+    main () {
       return this.configDb.data?.settings?.typingWay;
     },
   },
@@ -85,14 +70,13 @@ export default {
     TypingSettings,
     ArtiTyping,
   },
-  mounted() {
+  mounted () {
     // 等待utools挂载~
-    let waitReoad = setInterval(() => {
+    let waitReload = setInterval(() => {
       try {
         this.configDb = getDtConfig();
-        clearInterval(waitReoad);
+        clearInterval(waitReload);
         this.configPage = JSON.parse(JSON.stringify(this.configDb.data));
-        console.log("article_1: ", getDataById("article_1"));
       } catch (err) {
         console.error(err);
       }
@@ -124,6 +108,10 @@ body {
   --buttonFontColor: #585a5f;
 
   --resetButtonBackColor: #f8f8f8;
+
+  --trueFontColor: #1ba326;
+  --falseFontColor: #e53935;
+  --articleBackColor: #f4fbff;
 }
 
 @media (prefers-color-scheme: dark) {
