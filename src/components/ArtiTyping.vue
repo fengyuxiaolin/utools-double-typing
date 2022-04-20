@@ -29,7 +29,7 @@
     <!-- 下面显示文本域 -->
     <div id="typingArticle">
       <textarea class="textarea" type="text" v-model="nowTypingArticle" @input="textAreaInput"
-        @keydown='isChineseInput' />
+        @keydown='canIChangeRow' />
       <div class="textarea">hello</div>
     </div>
     <!-- 右侧面板 -->
@@ -117,14 +117,25 @@ function textAreaInput (e) {
   }
 }
 
+// 判断是否可换行
+function canIChangeRow (e) {
+  console.log('key: ', e);
+  if (isChineseInput(e)) {
+    canChangeRow = !isInMainKey(e);
+  } else {
+    canChangeRow = true;
+  }
+
+}
+
 // 判断是否输入中文
 function isChineseInput (e) {
-  if (e.keyCode === 229 && e.code.toLowerCase().indexOf("key") !== -1) {
-    // 匹配键盘主键区
-    canChangeRow = false;
-  } else {
-    canChangeRow = true
-  }
+  return e.keyCode === 229
+}
+
+// 判断是否在主键区
+function isInMainKey (e) {
+  return e.code.toLowerCase().indexOf("key") !== -1
 }
 
 </script>

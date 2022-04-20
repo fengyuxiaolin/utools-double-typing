@@ -64,6 +64,7 @@ window.convertCanvasToBuffer = (canvas) => {
 
 // 导入fs模块
 const fs = require('fs');
+
 /**
  * 保存文件
  * @param {string} filePath 文件路径
