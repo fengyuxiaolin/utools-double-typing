@@ -5,7 +5,25 @@
     <el-button @click="openAllArticleBox" class="littleButton"> > </el-button>
   </el-tooltip>
   <!-- 从左至右的抽屉显示所有短文 -->
-  <el-drawer v-model="allArticleBox" title="选择一篇短文" direction="ltr" :show-close="false">
+  <el-drawer v-model="allArticleBox" direction="ltr" :show-close="false">
+    <!-- 自定义title -->
+    <template #title>
+      <div class="drawerTitle">
+        <span>选择一篇短文</span>
+        <el-tooltip content="添加短文">
+          <el-button @click="addArticle" class="addArticleButton">
+            <el-icon>
+              <plus class="plusIcon" />
+            </el-icon>
+          </el-button>
+        </el-tooltip>
+      </div>
+    </template>
+    <el-row>
+      <el-col :span="24">
+        <el-input v-model="searchArticleTitle" placeholder="搜索短文" @keyup.enter="searchArticle"></el-input>
+      </el-col>
+    </el-row>
     <!-- 一个简单无限滚动 -->
     <ul v-infinite-scroll="loadMoreArticle" id="allArticleList" :infinite-scroll-delay="300">
       <li v-for="article in allArticleList" :key="article" @click="openArticle(article.articleId)">
@@ -13,6 +31,7 @@
       </li>
     </ul>
   </el-drawer>
+  <AddArticle :openAddArticle="openAddArticle" :configDb="configDb" :configPage="configPage" />
   <!-- 页面显示当前短文 -->
   <div id="nowArticleBox">
     <!-- 上面显示原文 -->
@@ -29,7 +48,7 @@
     <!-- 下面显示文本域 -->
     <div id="typingArticle">
       <textarea class="textarea" type="text" v-model="nowTypingArticle" @input="textAreaInput"
-        @keydown='canIChangeRow' />
+        @keydown="canIChangeRow" />
       <div class="textarea">hello</div>
     </div>
     <!-- 右侧面板 -->
@@ -44,7 +63,9 @@ const props = defineProps(["configDb", "configPage"]);
 let configDb = props.configDb, // 数据库
   configPage = ref(props.configPage), // 页面设置
   allArticleBox = ref(false), // 所有短文抽屉开关
+  openAddArticle = ref({ open: false }), // 添加短文开关
   allArticleList = ref([]), // 所有短文列表
+  searchArticleTitle = ref(""), // 搜索短文标题
   nowLoad = 0, // 当前加载的短文数量
   nowArticleDb = ref({}), // 当前短文数据库
   nowArticle = ref({ article: "" }), // 当前打开的短文
@@ -75,9 +96,21 @@ function initAllArticleList () {
 
 // 加载更多短文
 function loadMoreArticle () {
+  console.log('load: ', configPage.value.articles);
   let newArticleList = configPage.value.articles.slice(nowLoad, nowLoad + 5);
   allArticleList.value.push(...newArticleList);
-  nowLoad += 5;
+  nowLoad = nowLoad + 5 > configPage.value.articles.length ? configPage.value.articles.length : 5;
+}
+
+// 搜索短文
+function searchArticle (e) {
+  console.log('searchArticle: ', e);
+}
+
+// 打开创建短文弹窗
+function addArticle () {
+  console.log('open: ', openAddArticle);
+  openAddArticle.value.open = true;
 }
 
 // 打开一篇短文
@@ -96,6 +129,10 @@ function openAllArticleBox () {
 
 // 文本域输入事件
 function textAreaInput (e) {
+  // 如果输入的最后一个内容是中文，则允许换行
+  if (isChinese(e.target.value.substring(e.target.value.length - 1))) {
+    canChangeRow = true;
+  }
   // 将输入的内容写入#typingArticle div.textarea
   document.querySelector("#typingArticle div.textarea").innerText = e.target.value;
   // 获取当前div高度
@@ -119,13 +156,17 @@ function textAreaInput (e) {
 
 // 判断是否可换行
 function canIChangeRow (e) {
-  console.log('key: ', e);
   if (isChineseInput(e)) {
     canChangeRow = !isInMainKey(e);
   } else {
     canChangeRow = true;
   }
 
+}
+
+// 正则校验中文
+function isChinese (str) {
+  return /[\u4e00-\u9fa5]/.test(str);
 }
 
 // 判断是否输入中文
@@ -231,5 +272,17 @@ ul {
 #typingArticle div.textarea {
   display: inline-block;
   visibility: hidden;
+}
+
+.addArticleButton {
+  padding: 0;
+  border: 0;
+  height: 1em;
+  margin-right: 12px;
+  float: right;
+}
+.addArticleButton:hover {
+  cursor: pointer;
+  background-color: #fff0;
 }
 </style>

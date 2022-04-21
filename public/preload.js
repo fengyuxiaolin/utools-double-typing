@@ -109,3 +109,27 @@ let generateArticleId = () => {
     let timestamp = date.getTime()
     return ARTICLE_ID_PREFIX + timestamp
 }
+
+/**
+ * @typedef {object} article 文章数据
+ * @property {string} title 文章标题
+ * @property {string} author 文章作者
+ * @property {string} content 文章内容
+ */
+/**
+ * 创建短文
+ * @param {article} 文章数据
+ * @returns 
+ */
+window.createArticle = ({ articleTitle, articleAuthor, articleContent }) => {
+    let article = {
+        _id: generateArticleId(),
+        data: {
+            title: articleTitle,
+            author: articleAuthor,
+            article: articleContent
+        }
+    }
+    window.updateUtoolsDB(article);
+    return article;
+}
