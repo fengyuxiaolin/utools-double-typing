@@ -47,11 +47,14 @@
     </el-scrollbar>
     <!-- 下面显示文本域 -->
     <div id="typingArticle">
-      <textarea class="textarea" type="text" v-model="nowTypingArticle" @input="textAreaInput"
-        @keydown="canIChangeRow" />
+      <textarea class="textarea" type="text" v-model="nowTypingArticle" @input="textAreaInput" @keydown="canIChangeRow"
+        @keydown.tab="tabDown" @keydown.backspace="backspaceDown" />
       <div class="textarea">hello</div>
     </div>
-    <!-- 右侧面板 -->
+    <!-- 右侧面板, 记录数据 -->
+    <el-card class="rightPanel" shadow="always">
+      <ArticleRightPanel ref='rightPanel' :nowArticle='nowArticle' :nowTypingArticle='nowTypingArticle' />
+    </el-card>
   </div>
 </template>
 
@@ -68,11 +71,12 @@ let configDb = props.configDb, // 数据库
   searchArticleTitle = ref(""), // 搜索短文标题
   nowLoad = 0, // 当前加载的短文数量
   nowArticleDb = ref({}), // 当前短文数据库
-  nowArticle = ref({ article: "" }), // 当前打开的短文
-  divHeight = 0, // 隐藏输入div的高度
+  nowArticle = ref({ article: "", title: "", author: "" }), // 当前打开的短文
+  rowHeight = 0, // 隐藏输入div的高度
   nowInputRow = 0, // 上一行的top值
   originArticleBar = ref(null), // 原文滚动条
   canChangeRow = false, // 是否可换行按键
+  rightPanel = ref(null), // 右侧面板
 
   nowTypingArticle = ref(""); // 当前输入的短文的文本
 
@@ -120,6 +124,9 @@ function openArticle (articleId) {
   nowArticle.value = nowArticleDb.value.data;
   // 关闭所有短文抽屉
   allArticleBox.value = false;
+  // 设置右侧面板信息
+  rightPanel.value.formData.title = nowArticle.value.title;
+  rightPanel.value.formData.author = nowArticle.value.author;
 }
 
 // 打开左侧抽屉
@@ -129,6 +136,7 @@ function openAllArticleBox () {
 
 // 文本域输入事件
 function textAreaInput (e) {
+  rightPanel.value.toStartInterval();
   // 如果输入的最后一个内容是中文，则允许换行
   if (isChinese(e.target.value.substring(e.target.value.length - 1))) {
     canChangeRow = true;
@@ -141,16 +149,13 @@ function textAreaInput (e) {
   if (nowInputRow === 0) {
     nowInputRow++;
   }
-  if (divHeight === 0) {
-    divHeight = newDivHeight;
-  } else if (!canChangeRow || newDivHeight === divHeight * nowInputRow) {
+  if (rowHeight === 0) {
+    rowHeight = newDivHeight;
+  } else if (!canChangeRow || newDivHeight === rowHeight * nowInputRow) {
     return;
-  } else if (nowInputRow === 1 && newDivHeight > divHeight) {
-    originArticleBar.value.setScrollTop(newDivHeight - divHeight - divHeight / 2);
-    nowInputRow++;
   } else {
-    originArticleBar.value.setScrollTop(newDivHeight - divHeight);
-    newDivHeight > divHeight * nowInputRow ? nowInputRow++ : nowInputRow--;
+    originArticleBar.value.setScrollTop(newDivHeight - rowHeight * 2);
+    newDivHeight > rowHeight * nowInputRow ? nowInputRow++ : nowInputRow--;
   }
 }
 
@@ -161,12 +166,11 @@ function canIChangeRow (e) {
   } else {
     canChangeRow = true;
   }
-
 }
 
 // 正则校验中文
 function isChinese (str) {
-  return /[\u4e00-\u9fa5]/.test(str);
+  return /(?:[\u3400-\u4DB5\u4E00-\u9FEF\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\uD840-\uD868\uD86A-\uD86C\uD86F-\uD872\uD874-\uD879][\uDC00-\uDFFF]|\uD869[\uDC00-\uDED6\uDF00-\uDFFF]|\uD86D[\uDC00-\uDF34\uDF40-\uDFFF]|\uD86E[\uDC00-\uDC1D\uDC20-\uDFFF]|\uD873[\uDC00-\uDEA1\uDEB0-\uDFFF]|\uD87A[\uDC00-\uDFE0])/.test(str);
 }
 
 // 判断是否输入中文
@@ -178,6 +182,55 @@ function isChineseInput (e) {
 function isInMainKey (e) {
   return e.code.toLowerCase().indexOf("key") !== -1
 }
+
+// tab键按下事件
+function tabDown (e) {
+  // 移除原生tab键事件
+  e.preventDefault();
+  // 获取当前输入光标
+  const cursor = e.target.selectionStart;
+  // 如果光标下一位是标点， 则将光标向下移动一位
+  console.log('cursor: ', e.target.value.substring(cursor, cursor + 1));
+  if (isPunctuation(e.target.value.substring(cursor, cursor + 1))) {
+    e.target.selectionStart = cursor + 1;
+  }
+}
+
+// backspace键按下事件
+function backspaceDown (e) {
+  // textArea
+  const textArea = e.target;
+  // 阻止原生backspace键事件
+  e.preventDefault();
+  // 获取当前光标选中区域
+  const start = textArea.selectionStart;
+  const end = textArea.selectionEnd;
+  // 原文本
+  const text = textArea.value;
+  // 如果光标选中区域不是空，则删除选中区域, 如果光标选中区域是空，则删除光标前一位
+  let newText = '';
+  if (start !== end) {
+    newText = text.substring(0, start) + text.substring(end);
+  } else {
+    newText = text.substring(0, start - 1) + text.substring(start);
+  }
+  // 重新赋值
+  textArea.value = newText;
+  // 重新设置光标
+  let newStart = end - start == 1 ? start : start - 1
+  textArea.selectionStart = newStart;
+  textArea.selectionEnd = newStart;
+
+  // 设置右侧面板信息
+  let backSize = end == start ? 1 : end - start;
+  rightPanel.value.formData.backSeveral += backSize;
+}
+
+// 标点符号判断
+function isPunctuation (str) {
+  return /[\u3002|\uff1f|\uff01|\uff0c|\u3001|\uff1b|\uff1a|\u201c|\u201d|\u2018|\u2019|\uff08|\uff09|\u300a|\u300b|\u3008|\u3009|\u3010|\u3011|\u300e|\u300f|\u300c|\u300d|\ufe43|\ufe44|\u3014|\u3015|\u2026|\u2014|\uff5e|\ufe4f|\uffe5\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]/.test(str);
+}
+
 
 </script>
 
@@ -235,7 +288,7 @@ ul {
   padding: 10px;
   position: absolute;
   top: 48px;
-  left: 80px;
+  left: 56px;
   width: 60%;
   height: 260px;
   font-size: 18px;
@@ -248,7 +301,7 @@ ul {
   padding: 10px;
   position: absolute;
   top: 308px;
-  left: 80px;
+  left: 56px;
   width: 60%;
   height: 180px;
   box-sizing: border-box;
@@ -284,5 +337,15 @@ ul {
 .addArticleButton:hover {
   cursor: pointer;
   background-color: #fff0;
+}
+
+/* 右侧面板 */
+.rightPanel {
+  position: absolute;
+  top: 48px;
+  right: 56px;
+  width: 180px;
+  height: 296px;
+  background-color: var(--rightPanelBackColor);
 }
 </style>

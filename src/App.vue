@@ -112,6 +112,8 @@ body {
   --trueFontColor: #1ba326;
   --falseFontColor: #e53935;
   --articleBackColor: #f4fbff;
+
+  --rightPanelBackColor: #ffffffcc;
 }
 
 @media (prefers-color-scheme: dark) {
