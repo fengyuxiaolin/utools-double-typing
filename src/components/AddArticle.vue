@@ -39,7 +39,7 @@ import { defineEmits } from '@vue/runtime-core';
 export default {
   inheritAttrs: false,
   components: {},
-  props: ['openAddArticle', 'configDb', 'configPage'],
+  props: ['openAddArticle', 'configDb', 'configPage', 'initArticle'],
   data () {
     // 校验数据库是否存在该标题
     var checkArticleTitle = (rules, articleTitle, cb) => {
@@ -102,6 +102,7 @@ export default {
       this.$refs['articleForm'].validate(valid => {
         if (!valid) return
         let articleDb = createArticle(this.formData);
+        console.log('db: ', this.$props.configDb.data);
         this.$props.configDb.data.articles.push({
           articleName: articleDb.data.title,
           articleId: articleDb._id,
@@ -111,6 +112,7 @@ export default {
           articleName: articleDb.data.title,
           articleId: articleDb._id
         })
+        this.$props.initArticle.init();
         this.close();
       })
     },

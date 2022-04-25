@@ -3,7 +3,8 @@
     <el-form ref="articleForm" :model="formData">
       <el-row>
         <el-form-item label="标题" prop="title">
-          <el-input v-model="formData.title" clearable :style="{width: '100%'}" disabled>
+          <el-input v-model="formData.title" clearable :style="{width: '100%'}"
+            disabled>
           </el-input>
         </el-form-item>
       </el-row>

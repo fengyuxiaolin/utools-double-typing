@@ -32,7 +32,8 @@
       </li>
     </ul>
   </el-drawer>
-  <AddArticle :openAddArticle="openAddArticle" :configDb="configDb" :configPage="configPage" />
+  <AddArticle :openAddArticle="openAddArticle" :configDb="configDb" :configPage="configPage"
+    :initArticle='initArticle' />
   <!-- 页面显示当前短文 -->
   <div id="nowArticleBox">
     <!-- 上面显示原文 -->
@@ -63,6 +64,7 @@
         <el-button type="info" @click="rightPanel.typingEnd = false">ok</el-button>
       </span>
     </el-dialog>
+    <contextmenu :contextList='contextList' />
   </div>
 </template>
 
@@ -99,7 +101,19 @@ let configDb = props.configDb, // 数据库
     typingInterval: null,
     typingEnd: false
   }), // 右侧面板
-
+  contextList = ref([
+    {
+      label: '新建短文',
+      click: () => {
+        openAddArticle.value.open = true;
+      }
+    },
+    {
+      label: '保存配置',
+      click: saveConfig
+    }
+  ]),
+  initArticle = { init: initAllArticleList }, // 添加后初始化短文
   nowTypingArticle = ref(""); // 当前输入的短文的文本
 
 //初始化页面
@@ -267,7 +281,7 @@ function tabDown (e) {
 function backspaceDown (e) {
   // textArea
   const textArea = e.target;
-  // 阻止原生backspace键事件, 搞不了还是用原生吧
+  // 阻止原生backspace键事件（搞不了还是用原生吧）
   //   e.preventDefault();
   // 获取当前光标选中区域
   const start = textArea.selectionStart;
@@ -296,6 +310,13 @@ function backspaceDown (e) {
 // 标点符号判断
 function isPunctuation (str) {
   return /[\u3002|\uff1f|\uff01|\uff0c|\u3001|\uff1b|\uff1a|\u201c|\u201d|\u2018|\u2019|\uff08|\uff09|\u300a|\u300b|\u3008|\u3009|\u3010|\u3011|\u300e|\u300f|\u300c|\u300d|\ufe43|\ufe44|\u3014|\u3015|\u2026|\u2014|\uff5e|\ufe4f|\uffe5\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]/.test(str);
+}
+
+// 保存设置
+function saveConfig () {
+  configDb.data.settings = configPage.value.settings;
+  // 保存页面设置
+  updateUtoolsDB(configDb);
 }
 
 

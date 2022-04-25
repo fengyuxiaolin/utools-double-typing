@@ -28,7 +28,7 @@
 
 <script setup>
 // 获取父组件传入的值
-const props = defineProps(["configPage", "configPage"]);
+const props = defineProps(["configDb", "configPage"]);
 const emit = defineEmits(["addNewScheme", "changePage"]);
 
 const configPage = props.configPage, // 设置

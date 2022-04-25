@@ -13,7 +13,6 @@ let props = defineProps(["contextList"]);
 // 声明页面所需数据
 let menuVisible = ref(false), // 是否显示菜单
   contextList = props.contextList; // 菜单列表
-console.log("contextList: ", contextList);
 
 // 挂载到body
 onMounted(() => {
@@ -23,13 +22,12 @@ onMounted(() => {
       document.body.children[elem].remove();
     }
   }
-  console.log('true: ', document.body.children);
   document.body.appendChild(document.getElementById("contextmenu"));
 });
 
 // 实现一个右键菜单
 function rightClick (key) {
-  document.querySelectorAll('.el-dialog__body').forEach(item => {
+  document.querySelectorAll('.el-dialog__body')?.forEach(item => {
     item.addEventListener('click', foo);
   });
   menuVisible.value = false; // 先把模态框关死，目的是 第二次或者第n次右键鼠标的时候 它默认的是true
@@ -38,7 +36,6 @@ function rightClick (key) {
   styleMenu(key, menu);
 }
 function foo (e) {
-  console.log('e: ', e);
   menuVisible.value = false;
 }
 function styleMenu (key, menu) {

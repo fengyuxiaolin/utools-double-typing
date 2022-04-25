@@ -33,16 +33,16 @@ export default {
   methods: {
     // 切换打字页面的方法
     changePage (page) {
-      this.configDb.data.settings.typingWay = page;
+      this.configPage.settings.typingWay = page;
     },
     // 关闭新建方案的弹窗
     offAddNewScheme (val) {
       console.log(val);
       this.configPage = JSON.parse(JSON.stringify(this.configDb.data));
-      let tv = this.configDb.data?.settings?.typingWay;
-      this.configDb.data.settings.typingWay = "";
+      let tv = this.configPage.settings?.typingWay;
+      this.configPage.settings.typingWay = "";
       setTimeout(() => {
-        this.configDb.data.settings.typingWay = tv;
+        this.configPage.settings.typingWay = tv;
       }, 1);
 
       this.addNewScheme = false;
@@ -61,7 +61,7 @@ export default {
       }
     },
     main () {
-      return this.configDb.data?.settings?.typingWay;
+      return this.configPage?.settings?.typingWay;
     },
   },
   watch: {},
