@@ -29,16 +29,19 @@ onMounted(() => {
 
 // 实现一个右键菜单
 function rightClick (key) {
+  document.querySelectorAll('.el-dialog__body').forEach(item => {
+    item.addEventListener('click', foo);
+  });
   menuVisible.value = false; // 先把模态框关死，目的是 第二次或者第n次右键鼠标的时候 它默认的是true
   menuVisible.value = true; // 显示模态窗口，跳出自定义菜单栏
   var menu = document.querySelector(".menu");
   styleMenu(key, menu);
 }
-function foo () {
+function foo (e) {
+  console.log('e: ', e);
   menuVisible.value = false;
 }
 function styleMenu (key, menu) {
-  document.addEventListener("click", foo); // 给整个document新增监听鼠标事件，点击任何位置执行foo方法
   menu.style.left = key.clientX + "px";
   menu.style.top = key.clientY + "px";
   // 如果点击位置在页面的右边，则菜单栏的位置往左移动
@@ -51,11 +54,12 @@ function styleMenu (key, menu) {
   if (key.clientY + menuHeight + 20 > document.body.clientHeight) {
     menu.style.top = key.clientY - menuHeight + "px";
   }
-  console.log('clientx: ', key.clientX);
-  console.log('clientWidth: ', document.body.clientWidth);
 }
 // 绑定右键菜单栏事件
 document.addEventListener("contextmenu", rightClick);
+// 给整个document新增监听鼠标事件，点击任何位置执行foo方法
+document.addEventListener("click", foo);
+
 
 // 定义方法
 // 右键菜单栏选择项
