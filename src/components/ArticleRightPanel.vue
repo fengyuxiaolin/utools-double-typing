@@ -68,7 +68,6 @@ export default {
         backSeveral: 0,
         errSeveral: 0,
       },
-      typingInterval: undefined,
       timerDetails: {
         hour: 0,
         minute: 0,
@@ -80,13 +79,16 @@ export default {
   computed: {
     typingStart () {
       return this.$props.rightPanel.typingStart;
+    },
+    typingInterval () {
+      return this.$props.rightPanel.typingInterval;
     }
   },
   watch: {
     typingStart (a, b) {
       if (a == true) {
         this.toStartInterval();
-        this.typingStart = false;
+        this.$props.rightPanel.typingStart = false;
       }
     }
   },
@@ -103,7 +105,7 @@ export default {
           second: 0,
           pureSecond: 0
         };
-        this.typingInterval = setInterval(() => {
+        this.$props.rightPanel.typingInterval = setInterval(() => {
           // 计时
           this.formData.timer = this.timerPlus();
           // 进度 = 当前字数 / 总字数 * 100%
@@ -126,7 +128,8 @@ export default {
           this.formData.speed = (this.nowTypingArticle.length == 0 ? 0 : (this.nowTypingArticle.length / this.timerDetails.pureSecond * 60).toFixed(2)) + '字/分';
           // 进度达到100%时，清除定时器
           if (schedule >= 100) {
-            clearInterval(this.typingInterval);
+            clearInterval(this.$props.rightPanel.typingInterval);
+            this.$props.rightPanel.typingEnd = true;
           }
         }, 1000)
       }

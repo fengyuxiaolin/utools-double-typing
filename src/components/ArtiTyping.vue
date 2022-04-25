@@ -56,10 +56,10 @@
       <ArticleRightPanel :rightPanel='rightPanel' :nowArticle='nowArticle' :nowTypingArticle='nowTypingArticle' />
     </el-card>
     <!-- 完成练习 -->
-    <el-dialog title="完成练习" v-model="endTyping" width="30%" draggable>
+    <el-dialog title="完成练习" v-model="rightPanel.typingEnd" width="30%" draggable>
       <p style="margin: -25px 10px 25px;">本文已完成</p>
       <span class="dialog-footer" style="float: right; position: relative; bottom: 10px">
-        <el-button type="info" @click="endTyping = false">ok</el-button>
+        <el-button type="info" @click="rightPanel.typingEnd = false">ok</el-button>
       </span>
     </el-dialog>
   </div>
@@ -95,9 +95,9 @@ let configDb = props.configDb, // 数据库
       errSeveral: 0
     },
     typingStart: false,
-    typingInterval: null
+    typingInterval: null,
+    typingEnd: false
   }), // 右侧面板
-  endTyping = ref(false), // 完成练习弹窗
 
   nowTypingArticle = ref(""); // 当前输入的短文的文本
 
@@ -235,7 +235,7 @@ function tabDown (e) {
 function backspaceDown (e) {
   // textArea
   const textArea = e.target;
-  // 阻止原生backspace键事件
+  // 阻止原生backspace键事件, 搞不了还是用原生吧
   //   e.preventDefault();
   // 获取当前光标选中区域
   const start = textArea.selectionStart;
