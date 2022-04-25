@@ -49,12 +49,19 @@
     <div id="typingArticle">
       <textarea class="textarea" type="text" v-model="nowTypingArticle" @input="textAreaInput" @keydown="canIChangeRow"
         @keydown.tab="tabDown" @keydown.backspace="backspaceDown" />
-      <div class="textarea">hello</div>
+      <div class="textarea"></div>
     </div>
     <!-- 右侧面板, 记录数据 -->
     <el-card class="rightPanel" shadow="always">
-      <ArticleRightPanel ref='rightPanel' :nowArticle='nowArticle' :nowTypingArticle='nowTypingArticle' />
+      <ArticleRightPanel :rightPanel='rightPanel' :nowArticle='nowArticle' :nowTypingArticle='nowTypingArticle' />
     </el-card>
+    <!-- 完成练习 -->
+    <el-dialog title="完成练习" v-model="endTyping" width="30%" draggable>
+      <p style="margin: -25px 10px 25px;">本文已完成</p>
+      <span class="dialog-footer" style="float: right; position: relative; bottom: 10px">
+        <el-button type="info" @click="endTyping = false">ok</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -70,13 +77,27 @@ let configDb = props.configDb, // 数据库
   allArticleList = ref([]), // 所有短文列表
   searchArticleTitle = ref(""), // 搜索短文标题
   nowLoad = 0, // 当前加载的短文数量
-  nowArticleDb = ref({}), // 当前短文数据库
+  nowArticleDb = ref({ id: '', data: '', _rev: '' }), // 当前短文数据库
   nowArticle = ref({ article: "", title: "", author: "" }), // 当前打开的短文
   rowHeight = 0, // 隐藏输入div的高度
   nowInputRow = 0, // 上一行的top值
   originArticleBar = ref(null), // 原文滚动条
   canChangeRow = false, // 是否可换行按键
-  rightPanel = ref(null), // 右侧面板
+  rightPanel = ref({
+    formData: {
+      title: '',
+      author: '',
+      speed: "0字/分",
+      correct: '100%',
+      timer: '00:00:00',
+      schedule: '0%',
+      backSeveral: 0,
+      errSeveral: 0
+    },
+    typingStart: false,
+    typingInterval: null
+  }), // 右侧面板
+  endTyping = ref(false), // 完成练习弹窗
 
   nowTypingArticle = ref(""); // 当前输入的短文的文本
 
@@ -113,20 +134,34 @@ function searchArticle (e) {
 
 // 打开创建短文弹窗
 function addArticle () {
-  console.log('open: ', openAddArticle);
   openAddArticle.value.open = true;
 }
 
 // 打开一篇短文
 function openArticle (articleId) {
+  // 清空当前输入
+  nowTypingArticle.value = "";
   // 获取id为articleId的短文
   nowArticleDb.value = getDataById(articleId);
   nowArticle.value = nowArticleDb.value.data;
   // 关闭所有短文抽屉
   allArticleBox.value = false;
   // 设置右侧面板信息
-  rightPanel.value.formData.title = nowArticle.value.title;
-  rightPanel.value.formData.author = nowArticle.value.author;
+  const rightPanelData = rightPanel.value.formData;
+  rightPanelData.title = nowArticle.value.title;
+  rightPanelData.author = nowArticle.value.author;
+  rightPanelData.speed = '0字/分';
+  rightPanelData.correct = '100%'
+  rightPanelData.timer = '00:00:00';
+  rightPanelData.schedule = '0%';
+  rightPanelData.backSeveral = 0;
+  rightPanelData.errSeveral = 0;
+
+  // 清空计时器
+  if (rightPanel.value.typingInterval) {
+    clearInterval(rightPanel.value.typingInterval);
+  }
+  rightPanel.value.typingInterval = undefined;
 }
 
 // 打开左侧抽屉
@@ -136,7 +171,7 @@ function openAllArticleBox () {
 
 // 文本域输入事件
 function textAreaInput (e) {
-  rightPanel.value.toStartInterval();
+  rightPanel.value.typingStart = true;
   // 如果输入的最后一个内容是中文，则允许换行
   if (isChinese(e.target.value.substring(e.target.value.length - 1))) {
     canChangeRow = true;
@@ -201,25 +236,25 @@ function backspaceDown (e) {
   // textArea
   const textArea = e.target;
   // 阻止原生backspace键事件
-  e.preventDefault();
+  //   e.preventDefault();
   // 获取当前光标选中区域
   const start = textArea.selectionStart;
   const end = textArea.selectionEnd;
   // 原文本
-  const text = textArea.value;
+  //   const text = textArea.value;
   // 如果光标选中区域不是空，则删除选中区域, 如果光标选中区域是空，则删除光标前一位
-  let newText = '';
-  if (start !== end) {
-    newText = text.substring(0, start) + text.substring(end);
-  } else {
-    newText = text.substring(0, start - 1) + text.substring(start);
-  }
+  //   let newText = '';
+  //   if (start !== end) {
+  //     newText = text.substring(0, start) + text.substring(end);
+  //   } else {
+  //     newText = text.substring(0, start - 1) + text.substring(start);
+  //   }
   // 重新赋值
-  textArea.value = newText;
+  //   textArea.value = newText;
   // 重新设置光标
-  let newStart = end - start == 1 ? start : start - 1
-  textArea.selectionStart = newStart;
-  textArea.selectionEnd = newStart;
+  //   let newStart = end - start == 1 ? start : start - 1
+  //   textArea.selectionStart = newStart;
+  //   textArea.selectionEnd = newStart;
 
   // 设置右侧面板信息
   let backSize = end == start ? 1 : end - start;
@@ -306,6 +341,7 @@ ul {
   height: 180px;
   box-sizing: border-box;
   padding: 10px 0;
+  overflow: hidden;
 }
 #typingArticle .textarea {
   box-sizing: border-box;

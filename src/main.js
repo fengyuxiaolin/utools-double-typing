@@ -1,6 +1,4 @@
-import {
-    createApp
-} from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
 import pinyin from 'pinyin';
 /**
@@ -46,9 +44,20 @@ window.compare = (hanzi1, hanzi2) => {
     return pinyin.compare(hanzi1, hanzi2);
 }
 
-import {
-    Plus
-} from "@element-plus/icons-vue";
+import {CopyWritingCorrectService, CharacterCorrector, SpaceCorrector, UnitOfMeasurementCorrector} from 'copywriting-correct';
+
+const wcService = new CopyWritingCorrectService();
+wcService.resetCorrectors([
+    CharacterCorrector,
+    SpaceCorrector,
+    UnitOfMeasurementCorrector
+]);
+
+window.correctText = (text) => {
+    return wcService.correct(text);
+}
+
+import { Plus } from "@element-plus/icons-vue";
 let app = createApp(App);
 app.component('Plus', Plus);
 app.mount('#app')

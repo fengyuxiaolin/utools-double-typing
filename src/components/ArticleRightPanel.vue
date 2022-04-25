@@ -1,6 +1,6 @@
 <template>
   <div class="articleRightPanelBox">
-    <el-form ref="articleForm" :model="formData" :rules="rules">
+    <el-form ref="articleForm" :model="formData">
       <el-row>
         <el-form-item label="标题" prop="title">
           <el-input v-model="formData.title" clearable :style="{width: '100%'}" disabled>
@@ -55,28 +55,18 @@
 <script>
 export default {
   components: {},
-  props: ['nowArticle', 'nowTypingArticle'],
+  props: ['nowArticle', 'nowTypingArticle', 'rightPanel'],
   data () {
     return {
       formData: {
-        title: undefined,
-        author: undefined,
-        speed: "",
+        title: '',
+        author: '',
+        speed: "0字/分",
         correct: '100%',
         timer: '00:00:00',
         schedule: '0%',
         backSeveral: 0,
         errSeveral: 0,
-      },
-      rules: {
-        title: [],
-        author: [],
-        speed: [],
-        correct: [],
-        timer: [],
-        schedule: [],
-        backSeveral: [],
-        errSeveral: [],
       },
       typingInterval: undefined,
       timerDetails: {
@@ -87,18 +77,38 @@ export default {
       }
     }
   },
-  computed: {},
-  watch: {},
+  computed: {
+    typingStart () {
+      return this.$props.rightPanel.typingStart;
+    }
+  },
+  watch: {
+    typingStart (a, b) {
+      if (a == true) {
+        this.toStartInterval();
+        this.typingStart = false;
+      }
+    }
+  },
   created () { },
-  mounted () { },
+  mounted () {
+    this.formData = this.$props.rightPanel.formData;
+  },
   methods: {
     toStartInterval () {
       if (!this.typingInterval) {
+        this.timerDetails = {
+          hour: 0,
+          minute: 0,
+          second: 0,
+          pureSecond: 0
+        };
         this.typingInterval = setInterval(() => {
           // 计时
           this.formData.timer = this.timerPlus();
           // 进度 = 当前字数 / 总字数 * 100%
-          this.formData.schedule = (this.nowTypingArticle.length / this.nowArticle.article.length * 100).toFixed(2) + '%';
+          let schedule = (this.nowTypingArticle.length / this.nowArticle.article.length * 100).toFixed(2);
+          this.formData.schedule = schedule + '%';
           let trueLength = 0;
           let errSeveral = 0;
           for (const i in this.$props.nowTypingArticle) {
@@ -111,9 +121,13 @@ export default {
           // 错误数
           this.formData.errSeveral = errSeveral;
           // 正确率 = 正确字数 / 当前字数 * 100%
-          this.formData.correct = (trueLength / this.nowTypingArticle.length * 100).toFixed(2) + '%';
+          this.formData.correct = (trueLength == 0 ? 0 : (trueLength / this.nowTypingArticle.length * 100).toFixed(2)) + '%';
           // 速度 = 当前字数 / 计时
-          this.formData.speed = (this.nowTypingArticle.length / this.timerDetails.pureSecond * 60).toFixed(2) + '字/分';
+          this.formData.speed = (this.nowTypingArticle.length == 0 ? 0 : (this.nowTypingArticle.length / this.timerDetails.pureSecond * 60).toFixed(2)) + '字/分';
+          // 进度达到100%时，清除定时器
+          if (schedule >= 100) {
+            clearInterval(this.typingInterval);
+          }
         }, 1000)
       }
     },

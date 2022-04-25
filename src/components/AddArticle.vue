@@ -30,6 +30,7 @@
           </el-col>
         </el-row>
       </el-form>
+      <contextmenu :contextList="contextList" @selectItem="selectContext" :offset='contextOffset' />
     </el-dialog>
   </div>
 </template>
@@ -71,6 +72,16 @@ export default {
           message: '请输入正文',
           trigger: 'blur'
         }],
+      },
+      contextList: [
+        {
+          label: '排版文本',
+          click: this.textLayout
+        }
+      ],
+      contextOffset: {
+        x: 0,
+        y: 0
       }
     }
   },
@@ -103,6 +114,9 @@ export default {
         this.close();
       })
     },
+    textLayout () {
+      this.formData.articleContent = correctText(this.formData.articleContent);
+    }
   }
 }
 

@@ -3,30 +3,14 @@
     <span class="dict">{{ dict }}</span>
     <el-container>
       <el-header class="pinyin">{{ nowPinyin }}</el-header>
-      <el-input
-        class="typing"
-        v-model="typing"
-        @input="onWordTyping"
-        maxlength="2"
-        autofocus="true"
-        @keydown="keydown"
-        @keyup="keyup"
-      ></el-input>
+      <el-input class="typing" v-model="typing" @input="onWordTyping" maxlength="2" autofocus="true" @keydown="keydown"
+        @keyup="keyup"></el-input>
     </el-container>
   </el-space>
   <div id="keyboardMapBox">
-    <el-row
-      v-for="(row, i) in keyboardMap"
-      :key="i"
-      class="key-map-row"
-      :value="i"
-    >
+    <el-row v-for="(row, i) in keyboardMap" :key="i" class="key-map-row" :value="i">
       <el-col v-for="key in row" :key="key" :span="2">
-        <el-button
-          class="isNowPress isNextTrueKey"
-          @click="enterAKey(key.key)"
-          v-if="key.isNowPress"
-        >
+        <el-button class="isNowPress isNextTrueKey" @click="enterAKey(key.key)" v-if="key.isNowPress">
           <p>
             <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
 
@@ -39,11 +23,7 @@
             }}</span>
           </p>
         </el-button>
-        <el-button
-          class="isNextTrueKey"
-          @click="enterAKey(key.key)"
-          v-else-if="key.isNextTrueKey"
-        >
+        <el-button class="isNextTrueKey" @click="enterAKey(key.key)" v-else-if="key.isNextTrueKey">
           <p>
             <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
             <span class="keyMapSheng">{{ key.sheng }}</span>
@@ -54,11 +34,7 @@
             }}</span>
           </p>
         </el-button>
-        <el-button
-          class="isTrueKey"
-          @click="enterAKey(key.key)"
-          v-else-if="key.isTrueKey"
-        >
+        <el-button class="isTrueKey" @click="enterAKey(key.key)" v-else-if="key.isTrueKey">
           <p>
             <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
             <span class="keyMapSheng">{{ key.sheng }}</span>
@@ -69,10 +45,7 @@
             }}</span>
           </p>
         </el-button>
-        <el-button
-          style="width: 0; padding: 0; border: none"
-          v-else-if="key.key == ''"
-        ></el-button>
+        <el-button style="width: 0; padding: 0; border: none" v-else-if="key.key == ''"></el-button>
         <el-button class="bg-purple" @click="enterAKey(key.key)" v-else>
           <p>
             <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
@@ -124,10 +97,10 @@ let configDb, // utools数据库中的配置信息
   contextList = ref([]); // 右键菜单内容
 
 const ZERO_KEY = [
-    ["a", "ai", "an", "ang", "ao"],
-    ["e", "ei", "en", "eng", "er"],
-    ["o", "ou"],
-  ],
+  ["a", "ai", "an", "ang", "ao"],
+  ["e", "ei", "en", "eng", "er"],
+  ["o", "ou"],
+],
   KEYBOARD_KEY_ARR = [
     ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
     ["A", "S", "D", "F", "G", "H", "J", "K", "L", ";"],
@@ -151,7 +124,7 @@ if (configPage.settings.schemeName) {
 }
 
 // 初始化单字练习页面
-function initWordPage() {
+function initWordPage () {
   // 获取设置信息
   schemeName = configPage.settings.schemeName;
   typingModel = configPage.settings.typingModel;
@@ -191,7 +164,7 @@ function initWordPage() {
           if (zeroKeyIndex != -1) {
             document
               .getElementsByClassName("zeroKeyBox")
-              [zeroKeyIndex].classList.remove("isNextTrueKey");
+            [zeroKeyIndex]?.classList?.remove("isNextTrueKey");
           }
         }, 0);
         console.log(configPage.settings.typingModel);
@@ -204,7 +177,7 @@ function initWordPage() {
 }
 
 // 初始化右键菜单内容
-function initContextMenu() {
+function initContextMenu () {
   contextList.value = [
     {
       label: "导出键位图",
@@ -218,7 +191,7 @@ function initContextMenu() {
 }
 
 // 初始化创建方案页面
-function initCreateSchemePage() {
+function initCreateSchemePage () {
   // 获取设置信息
   schemeName = configPage.settings.schemeName;
   typingModel = configPage.settings.typingModel;
@@ -254,7 +227,7 @@ function initCreateSchemePage() {
 }
 
 // 初始化键位图
-function initKeyMap() {
+function initKeyMap () {
   keyboardMap.value = [[], [], []];
   for (let i = 0; i < KEYBOARD_KEY_ARR.length; i++) {
     for (let key of KEYBOARD_KEY_ARR[i]) {
@@ -264,7 +237,7 @@ function initKeyMap() {
 }
 
 // 按键初始化
-function newKey(key) {
+function newKey (key) {
   return {
     key: key,
     sheng: "",
@@ -276,7 +249,7 @@ function newKey(key) {
 }
 
 // 加载双拼方案
-function getScheme() {
+function getScheme () {
   schemeList = configPage.schemes;
   schemeList.forEach((scheme) => {
     if (scheme.name === configPage.settings.schemeName) {
@@ -289,7 +262,7 @@ function getScheme() {
 }
 
 // 将当前方案填充键位图
-function fillKeyMap() {
+function fillKeyMap () {
   for (let [sheng, keyboard] of nowScheme.sheng) {
     if (sheng != keyboard) {
       keyboardForEach(keyboard, (keyMapValue) => {
@@ -307,7 +280,7 @@ function fillKeyMap() {
 }
 
 // 获取文字、拼音信息
-function getWord() {
+function getWord () {
   // 文字
   const dictLength = configPage.dicts.length;
   if (configPage.settings.typingModel === "wordRandom") {
@@ -324,7 +297,7 @@ function getWord() {
 }
 
 // 根据当前方案获取双拼
-function getDoubleKeyList() {
+function getDoubleKeyList () {
   nowDoubleKeyList = new Set();
   pinyinList.forEach((pinyin) => {
     let first = pinyin.slice(0, 1);
@@ -347,7 +320,7 @@ function getDoubleKeyList() {
 }
 
 // 展示键位提示
-function showKeysTip(sp) {
+function showKeysTip (sp) {
   keyMapShengKey.isNextTrueKey = false;
   keyMapYunKey.isTrueKey = false;
   let doubleKey = sp;
@@ -358,7 +331,7 @@ function showKeysTip(sp) {
         doubleKey = dk;
         throw new Error();
       });
-    } catch {}
+    } catch { }
   }
   console.log(doubleKey);
   let nextTrueKey = doubleKey[0],
@@ -380,12 +353,12 @@ function showKeysTip(sp) {
       setTimeout(() => {
         document
           .getElementsByClassName("zeroKeyBox")
-          [zeroKeyIndex].classList.add("isNextTrueKey");
+        [zeroKeyIndex].classList.add("isNextTrueKey");
       }, 0);
     } else {
       document
         .getElementsByClassName("zeroKeyBox")
-        [zeroKeyIndex].classList.add("isNextTrueKey");
+      [zeroKeyIndex].classList.add("isNextTrueKey");
     }
   }
 }
@@ -395,7 +368,7 @@ function showKeysTip(sp) {
  * @param {String} keyboard
  * @param {function(keyMapValue)} callback  处理对应的键位图按键
  */
-function keyboardForEach(keyboard, callback) {
+function keyboardForEach (keyboard, callback) {
   for (let i = 0; i < KEYBOARD_KEY.length; i++) {
     let index = KEYBOARD_KEY[i].indexOf(keyboard);
     if (index != -1) {
@@ -405,13 +378,13 @@ function keyboardForEach(keyboard, callback) {
 }
 
 // 实时检测键盘按键按下
-function keydown(val) {
+function keydown (val) {
   keyboardForEach(val.key.toLowerCase(), (keyMapValue) => {
     keyMapValue.isNowPress = true;
   });
 }
 // 实时监测键盘按键抬起
-function keyup(val) {
+function keyup (val) {
   keyboardForEach(val.key.toLocaleLowerCase(), (keyMapValue) => {
     setTimeout(() => {
       keyMapValue.isNowPress = false;
@@ -420,7 +393,7 @@ function keyup(val) {
 }
 
 // 键位图的按键点击事件, 将按键的key输入到输入框
-function enterAKey(keyMapValue) {
+function enterAKey (keyMapValue) {
   // 如果传入的不在按键列表中，则返回
   if (!keyMapValue.toLowerCase) {
     return;
@@ -435,7 +408,7 @@ function enterAKey(keyMapValue) {
 }
 
 // 检测单字输入
-function onWordTyping(val) {
+function onWordTyping (val) {
   // 输入1个字母后判断声母, 矫正键位提示
 
   if (val.length == 1 && val.toLowerCase != keyMapShengKey.key.toLowerCase) {
@@ -453,7 +426,7 @@ function onWordTyping(val) {
       if (zeroKeyIndex != -1) {
         document
           .getElementsByClassName("zeroKeyBox")
-          [zeroKeyIndex].classList.remove("isNextTrueKey");
+        [zeroKeyIndex].classList.remove("isNextTrueKey");
       }
       wordProgress++;
       getWord();
@@ -468,11 +441,11 @@ function onWordTyping(val) {
 }
 
 // 执行选中的右键菜单回调
-function selectContext(cb) {
+function selectContext (cb) {
   cb();
 }
 // 导出键位图
-function exportKeyMap() {
+function exportKeyMap () {
   console.log("keyboardMapBox: ", document.querySelector("#keyboardMapBox"));
   html2canvas(document.querySelector("#keyboardMapBox")).then((canvas) => {
     // 从页面设置中获取当前方案名称
@@ -499,7 +472,7 @@ function exportKeyMap() {
 }
 
 // 保存页面设置
-function savePageSettings() {
+function savePageSettings () {
   configDb.data.settings = configPage.settings;
   // 保存页面设置
   updateUtoolsDB(configDb);
