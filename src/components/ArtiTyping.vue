@@ -21,7 +21,8 @@
     </template>
     <el-row>
       <el-col :span="24">
-        <el-input v-model="searchArticleTitle" placeholder="搜索短文" @keyup.enter="searchArticle"></el-input>
+        <el-input v-model="searchArticleTitle" placeholder="搜索短文" @input="searchLikeArticle"
+          @keyup.enter="searchArticle"></el-input>
       </el-col>
     </el-row>
     <!-- 一个简单无限滚动 -->
@@ -114,9 +115,10 @@ function initPage () {
 
 // 从页面设置中获取20条短文
 function initAllArticleList () {
-  let newArticleList = configPage.value.articles.slice(0, 15);
+  allArticleList.value = [];
+  let newArticleList = configPage.value.articles.slice(0, 20);
   allArticleList.value.push(...newArticleList);
-  nowLoad = 15;
+  nowLoad = 20;
 }
 
 // 加载更多短文
@@ -127,9 +129,39 @@ function loadMoreArticle () {
   nowLoad = nowLoad + 5 > configPage.value.articles.length ? configPage.value.articles.length : 5;
 }
 
+// 模糊搜索
+function searchLikeArticle (keyword) {
+  if (!keyword) {
+    initAllArticleList();
+    return;
+  }
+  allArticleList.value = [];
+  // 外层遍历关键词
+  for (let key of keyword) {
+    // 内层遍历所有短文搜索
+    foreachSearchArticle(key);
+  }
+}
+
 // 搜索短文
 function searchArticle (e) {
-  console.log('searchArticle: ', e);
+  const keyword = e.target.value;
+  if (!keyword) {
+    initAllArticleList();
+    return;
+  }
+  allArticleList.value = [];
+  // 遍历搜索
+  foreachSearchArticle(keyword);
+}
+
+// 遍历搜索短文方法
+function foreachSearchArticle (keyword) {
+  for (let article of configPage.value.articles) {
+    if (article.articleName.indexOf(keyword) != -1 && allArticleList.value.indexOf(article) == -1) {
+      allArticleList.value.push(article);
+    }
+  }
 }
 
 // 打开创建短文弹窗
