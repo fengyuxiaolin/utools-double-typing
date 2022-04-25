@@ -464,7 +464,7 @@ function exportKeyMap () {
     // 将buffer对象写入文件
     try {
       saveFile(filePath, buffer);
-      throw new Error("导出成功");
+      utools.showNotification("导出成功");
     } catch {
       utools.showNotification("导出失败");
     }
