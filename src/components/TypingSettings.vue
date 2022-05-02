@@ -30,7 +30,7 @@
       <el-switch active-text="键位提示" v-model="configPage.settings.keyMapTipsSwitch" />
     </el-col>
     <el-col v-if="configPage.settings.typingWay.toLowerCase() == 'wordtyping'" :span="4">
-      <el-switch active-text="实时键位" v-model="configPage.settings.keyDownTipsSwitch" />
+      <el-switch active-text="实时按键" v-model="configPage.settings.keyDownTipsSwitch" />
     </el-col>
   </el-row>
 </template>
