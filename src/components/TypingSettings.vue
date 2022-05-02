@@ -23,6 +23,15 @@
         </el-option-group>
       </el-select>
     </el-col>
+    <el-col v-if="configPage.settings.typingWay.toLowerCase() == 'wordtyping'" :span="4">
+      <el-switch active-text="键位图" v-model="configPage.settings.keyMapSwitch" />
+    </el-col>
+    <el-col v-if="configPage.settings.typingWay.toLowerCase() == 'wordtyping'" :span="4">
+      <el-switch active-text="键位提示" v-model="configPage.settings.keyMapTipsSwitch" />
+    </el-col>
+    <el-col v-if="configPage.settings.typingWay.toLowerCase() == 'wordtyping'" :span="4">
+      <el-switch active-text="实时键位" v-model="configPage.settings.keyDownTipsSwitch" />
+    </el-col>
   </el-row>
 </template>
 
@@ -32,9 +41,18 @@ const props = defineProps(["configDb", "configPage"]);
 const emit = defineEmits(["addNewScheme", "changePage"]);
 
 const configPage = props.configPage, // 设置
+  configDb = props.configDb, // 数据库
   schemeGroups = configPage.schemeGroups; // 方案分组信息
 
-console.log("typingSettings: ", configPage);
+if (configPage.settings.keyMapSwitch === undefined) {
+  configDb.data.settings.keyMapSwitch = true;
+  configDb.data.settings.keyMapTipsSwitch = true;
+  configDb.data.settings.keyDownTipsSwitch = true;
+  updateUtoolsDB(configDb);
+  configPage.settings.keyMapSwitch = true;
+  configPage.settings.keyMapTipsSwitch = true;
+  configPage.settings.keyDownTipsSwitch = true;
+}
 function addNewScheme () {
   emit("addNewScheme");
 }
