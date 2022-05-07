@@ -94,6 +94,7 @@ let configDb, // utools数据库中的配置信息
   nowDoubleKeyList = new Set(), // 当前方案下当前文字所有拼音对应的双拼
   typing = ref(), // 输入内容
   wordProgress = 0, // 单字练习进度
+  schemeTemp = ref(), // 临时方案
   contextList = ref([]); // 右键菜单内容
 
 const ZERO_KEY = [
@@ -217,10 +218,13 @@ function initCreateSchemePage () {
     }
   );
   watch(
-    () => configPage.schemes,
-    () => {
-      console.log(configPage.schemes);
-      initCreateSchemePage();
+    () => ({ ...configPage.schemes[configPage.schemes.length - 1] }),
+    (now) => {
+      let nowTemp = JSON.stringify(now);
+      if (nowTemp !== schemeTemp.value) {
+        schemeTemp.value = nowTemp;
+        initCreateSchemePage();
+      }
     },
     { deep: true }
   );

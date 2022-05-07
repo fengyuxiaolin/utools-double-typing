@@ -1,6 +1,6 @@
 <template>
   <el-header>
-    <component :is="settings" :configDb="configDb" :configPage="configPage" @addNewScheme="createScheme"
+    <component :is="settings" :configDb="appConfigDb" :configPage="appConfigPage" @addNewScheme="createScheme"
       @changePage="changePage"></component>
   </el-header>
   <transition name="slide-fade">
@@ -8,7 +8,7 @@
       <component :is="main" :configDb="configDb" :configPage="configPage"></component>
     </el-main>
   </transition>
-  <el-dialog v-model="addNewScheme" title="自定义方案" width="720px" draggable>
+  <el-dialog v-model="addNewScheme" v-if="addNewScheme" title="自定义方案" width="720px" draggable>
     <NewSchemeForm :configPage="newSchemeConfig" :configDb="configDb" @addNewScheme="offAddNewScheme" />
     <WordTyping :configPage="newSchemeConfig" />
     <span class="tips">tips:&nbsp;请为每个音节设置对应按键, 不设置会自动尝试绑定对应按键,
@@ -41,10 +41,11 @@ export default {
       this.configPage = JSON.parse(JSON.stringify(this.configDb.data));
       let tv = this.configPage.settings?.typingWay;
       this.configPage.settings.typingWay = "";
+      this.configDb.data = false;
       setTimeout(() => {
         this.configPage.settings.typingWay = tv;
+        this.configDb.data = this.configPage;
       }, 1);
-
       this.addNewScheme = false;
     },
     // 新建方案
@@ -55,6 +56,12 @@ export default {
     },
   },
   computed: {
+    appConfigDb () {
+      return this.configDb;
+    },
+    appConfigPage () {
+      return this.configPage;
+    },
     settings () {
       if (this.configDb.data) {
         return "TypingSettings";
