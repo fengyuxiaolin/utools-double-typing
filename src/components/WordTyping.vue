@@ -7,10 +7,10 @@
         @keyup="keyup"></el-input>
     </el-container>
   </el-space>
-  <div id="keyboardMapBox">
+  <div id="keyboardMapBox" v-show="configPage.settings.keyMapSwitch">
     <el-row v-for="(row, i) in keyboardMap" :key="i" class="key-map-row" :value="i">
       <el-col v-for="key in row" :key="key" :span="2">
-        <el-button class="isNowPress isNextTrueKey" @click="enterAKey(key.key)" v-if="key.isNowPress">
+        <el-button class="isNowPress isNextTrueKey" @click="enterAKey(key.key)" v-if="configPage.settings.keyDownTipsSwitch && key.isNowPress">
           <p>
             <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
 
@@ -23,7 +23,8 @@
             }}</span>
           </p>
         </el-button>
-        <el-button class="isNextTrueKey" @click="enterAKey(key.key)" v-else-if="key.isNextTrueKey">
+        <el-button class="isNextTrueKey" @click="enterAKey(key.key)"
+          v-else-if="configPage.settings.keyMapTipsSwitch && key.isNextTrueKey">
           <p>
             <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
             <span class="keyMapSheng">{{ key.sheng }}</span>
@@ -34,7 +35,8 @@
             }}</span>
           </p>
         </el-button>
-        <el-button class="isTrueKey" @click="enterAKey(key.key)" v-else-if="key.isTrueKey">
+        <el-button class="isTrueKey" @click="enterAKey(key.key)"
+          v-else-if="configPage.settings.keyMapTipsSwitch && key.isTrueKey">
           <p>
             <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
             <span class="keyMapSheng">{{ key.sheng }}</span>
@@ -175,6 +177,17 @@ function initWordPage () {
     },
     { deep: true }
   );
+  watch(
+    () => configPage.settings.keyMapTipsSwitch,
+    (target, origin) => {
+      if (target) {
+        showZeroKeysTip();
+      } else {
+        hideZeroKeysTip();
+      }
+    },
+    { deep: true }
+  )
 }
 
 // 初始化右键菜单内容
@@ -351,20 +364,7 @@ function showKeysTip (sp) {
   });
 
   // 零声母
-  let zeroKeyIndex = zeroKeyArr.indexOf(nowPinyin.value);
-  if (zeroKeyIndex != -1) {
-    if (document.getElementsByClassName("zeroKeyBox").length == 0) {
-      setTimeout(() => {
-        document
-          .getElementsByClassName("zeroKeyBox")
-        [zeroKeyIndex].classList.add("isNextTrueKey");
-      }, 0);
-    } else {
-      document
-        .getElementsByClassName("zeroKeyBox")
-      [zeroKeyIndex].classList.add("isNextTrueKey");
-    }
-  }
+  showZeroKeysTip();
 }
 
 // 遍历键位图
@@ -480,6 +480,34 @@ function savePageSettings () {
   configDb.data.settings = configPage.settings;
   // 保存页面设置
   updateUtoolsDB(configDb);
+}
+
+// 展示零声母提示
+function showZeroKeysTip () {
+  let zeroKeyIndex = zeroKeyArr.indexOf(nowPinyin.value);
+  if (zeroKeyIndex != -1 && configPage.settings.keyMapTipsSwitch) {
+    if (document.getElementsByClassName("zeroKeyBox").length == 0) {
+      setTimeout(() => {
+        document
+          .getElementsByClassName("zeroKeyBox")
+        [zeroKeyIndex].classList.add("isNextTrueKey");
+      }, 0);
+    } else {
+      document
+        .getElementsByClassName("zeroKeyBox")
+      [zeroKeyIndex].classList.add("isNextTrueKey");
+    }
+  }
+}
+
+// 隐藏零声母提示
+function hideZeroKeysTip () {
+  let zeroKeyIndex = zeroKeyArr.indexOf(nowPinyin.value);
+  if (zeroKeyIndex != -1 && !configPage.settings.keyMapTipsSwitch) {
+    document
+      .getElementsByClassName("zeroKeyBox")
+    [zeroKeyIndex].classList.remove("isNextTrueKey");
+  }
 }
 </script>
 

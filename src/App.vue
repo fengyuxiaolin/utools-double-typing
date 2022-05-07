@@ -145,8 +145,14 @@ body {
   color: var(--fontColor);
 }
 
-.el-input__inner {
+.el-input__inner,
+.el-input__wrapper {
   background-color: var(--backgroundColor);
+}
+#app .el-input__wrapper {
+  border: none;
+  outline: none;
+  box-shadow: none !important;
 }
 
 .el-header {
