@@ -82,7 +82,7 @@ export default {
       try {
         this.configDb = getDtConfig();
         clearInterval(waitReload);
-        if (!this.configDb.data.version || compareVersion(this.configDb.data.version, "1.0.3") < 0) {
+        if (!this.configDb.data.version || compareVersion(this.configDb.data.version, "1.1.0") < 0) {
           const initConf = readInitConfig();
           this.configDb.data.version = initConf.version;
           this.configDb.data.schemes = initConf.schemes;
