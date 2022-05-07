@@ -44,7 +44,7 @@ window.compare = (hanzi1, hanzi2) => {
     return pinyin.compare(hanzi1, hanzi2);
 }
 
-import {CopyWritingCorrectService, CharacterCorrector, SpaceCorrector, UnitOfMeasurementCorrector} from 'copywriting-correct';
+import { CopyWritingCorrectService, CharacterCorrector, SpaceCorrector, UnitOfMeasurementCorrector } from 'copywriting-correct';
 
 const wcService = new CopyWritingCorrectService();
 wcService.resetCorrectors([
@@ -55,6 +55,25 @@ wcService.resetCorrectors([
 
 window.correctText = (text) => {
     return wcService.correct(text);
+}
+
+// 比较两个版本号大小
+window.compareVersion = (v1, v2) => {
+    const v1List = v1.split('.');
+    const v2List = v2.split('.');
+    const len = Math.max(v1List.length, v2List.length);
+    for (let i = 0; i < len; i++) {
+        const n1 = parseInt(v1List[i] || 0);
+        const n2 = parseInt(v2List[i] || 0);
+        if (n1 > n2) {
+            return 1;
+        }
+        if (n1 < n2) {
+            return -1;
+        } else {
+            continue;
+        }
+    }
 }
 
 import { Plus } from "@element-plus/icons-vue";

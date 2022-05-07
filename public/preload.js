@@ -20,6 +20,13 @@ window.updateUtoolsDB = data => {
 }
 
 /**
+ * 读取初始化数据
+ */
+window.readInitConfig = () => {
+    return require('./data/config.json');
+}
+
+/**
  * 获取配置信息,如果不存在则进行初始化
  */
 window.getDtConfig = () => {

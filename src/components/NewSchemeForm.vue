@@ -366,24 +366,26 @@ export default {
         let index = -1;
         try {
           let haveGroup = false;
+          let schemeGroup = null;
           db.data.schemeGroups.forEach(group => {
             group.schemeList.find((name, i) => {
               if (name === schemeName) {
                 index = i;
+                console.log('index: ', index);
                 throw new Error();
               }
             });
-            console.log('index: ', index);
             if (group.groupName === this.formData.groupName) {
               if (index == -1) {
-                group.schemeList.push(schemeName);
+                schemeGroup = group;
               }
               haveGroup = true;
             }
-            if (haveGroup) {
-              throw new Error();
-            }
           });
+          if (haveGroup) {
+            schemeGroup.schemeList.push(schemeName);
+            throw new Error();
+          }
           db.data.schemeGroups.push({
             groupName: this.formData.groupName,
             schemeList: [schemeName]
@@ -393,11 +395,9 @@ export default {
           utools.showNotification("该名称已存在");
           return false;
         }
-        console.log('db: ', db);
         updateUtoolsDB(db);
         this.$props.configPage.schemes = db.data.schemes;
         this.$props.configPage.schemeGroups = db.data.schemeGroups;
-        console.log('page: ', this.$props.configPage);
         this.$emit("addNewScheme", false);
       });
     },

@@ -83,6 +83,13 @@ export default {
       try {
         this.configDb = getDtConfig();
         clearInterval(waitReload);
+        if (!this.configDb.data.version || compareVersion(this.configDb.data.version, "1.0.3") < 0) {
+          const initConf = readInitConfig();
+          this.configDb.data.version = initConf.version;
+          this.configDb.data.schemes = initConf.schemes;
+          this.configDb.data.schemeGroups = initConf.schemeGroups;
+          updateUtoolsDB(this.configDb);
+        }
         this.configPage = JSON.parse(JSON.stringify(this.configDb.data));
       } catch (err) {
         console.error(err);
