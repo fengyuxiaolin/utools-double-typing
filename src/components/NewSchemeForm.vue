@@ -196,7 +196,6 @@ export default {
     this.initSyllableOptions();
   },
   mounted () {
-    console.log('createPage', this.$props.configPage);
     let configPage = this.$props.configPage;
     this.newSchemeName = this.createSchemeName();
     configPage.settings.schemeName = this.newSchemeName;
@@ -220,7 +219,6 @@ export default {
       return schemeName;
     },
     changeSyllable (val) {
-      console.log(this.formData.syllable);
       this.formData.keyboard = '';
     },
     getNewDetails () {
@@ -311,7 +309,6 @@ export default {
     },
     submitForm () {
       this.$refs['newSchemeForm'].validate(valid => {
-        console.log('提交名称: ', this.formData.schemeFinallyName);
         const schemeName = this.formData.schemeFinallyName;
         const db = this.$props.configDb;
         db.data.settings.schemeName = schemeName;
@@ -371,7 +368,6 @@ export default {
             group.schemeList.find((name, i) => {
               if (name === schemeName) {
                 index = i;
-                console.log('index: ', index);
                 throw new Error();
               }
             });

@@ -5,7 +5,7 @@
   </el-header>
   <transition name="slide-fade">
     <el-main>
-      <component :is="main" :configDb="configDb" :configPage="configPage"></component>
+      <component :is="main" :configDb="configDb" :configPage="configPage" @addNewScheme="createScheme"></component>
     </el-main>
   </transition>
   <el-dialog v-model="addNewScheme" v-if="addNewScheme" title="自定义方案" width="720px" draggable>
@@ -37,7 +37,6 @@ export default {
     },
     // 关闭新建方案的弹窗
     offAddNewScheme (val) {
-      console.log(val);
       this.configPage = JSON.parse(JSON.stringify(this.configDb.data));
       let tv = this.configPage.settings?.typingWay;
       this.configPage.settings.typingWay = "";

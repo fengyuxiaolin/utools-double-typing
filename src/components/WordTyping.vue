@@ -10,7 +10,8 @@
   <div id="keyboardMapBox" v-show="configPage.settings.keyMapSwitch">
     <el-row v-for="(row, i) in keyboardMap" :key="i" class="key-map-row" :value="i">
       <el-col v-for="key in row" :key="key" :span="2">
-        <el-button class="isNowPress isNextTrueKey" @click="enterAKey(key.key)" v-if="configPage.settings.keyDownTipsSwitch && key.isNowPress">
+        <el-button class="isNowPress isNextTrueKey" @click="enterAKey(key.key)"
+          v-if="configPage.settings.keyDownTipsSwitch && key.isNowPress">
           <p>
             <span class="keyMapKey" :value="key.key">{{ key.key }}</span>
 
@@ -72,7 +73,7 @@
       </el-col>
     </el-row>
   </div>
-  <contextmenu :contextList="contextList" @selectItem="selectContext" />
+  <contextmenu :contextList="contextList" v-if="contextList.length > 0" @selectItem="selectContext" />
 </template>
 
 <script setup>
@@ -115,9 +116,9 @@ zeroKeyArr = ZERO_KEY.flat();
 
 // 从父组件获取配置
 const props = defineProps(["configDb", "configPage"]);
+const emits = defineEmits(['addNewScheme'])
 configDb = props.configDb;
 configPage = props.configPage;
-console.log(configPage);
 
 // 初始化页面
 if (configPage.settings.schemeName) {
@@ -170,7 +171,6 @@ function initWordPage () {
             [zeroKeyIndex]?.classList?.remove("isNextTrueKey");
           }
         }, 0);
-        console.log(configPage.settings.typingModel);
         // 重新加载页面
         initWordPage();
       }
@@ -194,13 +194,17 @@ function initWordPage () {
 function initContextMenu () {
   contextList.value = [
     {
+      label: "添加新方案",
+      click: () => { emits('addNewScheme') },
+    },
+    {
       label: "导出键位图",
       click: exportKeyMap,
     },
     {
       label: "保存页面设置",
       click: savePageSettings,
-    },
+    }
   ];
 }
 
@@ -223,7 +227,6 @@ function initCreateSchemePage () {
     () => {
       // 判断是否有变更
       let realChange = configPage.settings.schemeName != schemeName;
-      console.log("变更方案: ", configPage.settings.typingModel);
       if (realChange) {
         // 重新加载页面
         initCreateSchemePage();
@@ -350,7 +353,6 @@ function showKeysTip (sp) {
       });
     } catch { }
   }
-  console.log(doubleKey);
   let nextTrueKey = doubleKey[0],
     trueKey = doubleKey[1];
   // 第一个键
@@ -404,7 +406,6 @@ function enterAKey (keyMapValue) {
   }
   // 获取输入框
   let typingInput = document.querySelectorAll(".typing .el-input__inner")[0];
-  console.log("typing: ", typingInput);
   // 将按键输入到输入框
   typingInput.value += keyMapValue.toLowerCase();
   // 触发输入框的 input 事件
@@ -450,7 +451,6 @@ function selectContext (cb) {
 }
 // 导出键位图
 function exportKeyMap () {
-  console.log("keyboardMapBox: ", document.querySelector("#keyboardMapBox"));
   html2canvas(document.querySelector("#keyboardMapBox")).then((canvas) => {
     // 从页面设置中获取当前方案名称
     const fileName = `${configPage.settings.schemeName}-键位图.png`;

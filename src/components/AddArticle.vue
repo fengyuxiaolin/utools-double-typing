@@ -30,7 +30,8 @@
           </el-col>
         </el-row>
       </el-form>
-      <contextmenu :contextList="contextList" @selectItem="selectContext" :offset='contextOffset' />
+      <contextmenu :contextList="contextList" v-if="contextList.length > 0" @selectItem="selectContext"
+        :offset='contextOffset' />
     </el-dialog>
   </div>
 </template>
@@ -102,7 +103,6 @@ export default {
       this.$refs['articleForm'].validate(valid => {
         if (!valid) return
         let articleDb = createArticle(this.formData);
-        console.log('db: ', this.$props.configDb.data);
         this.$props.configDb.data.articles.push({
           articleName: articleDb.data.title,
           articleId: articleDb._id,

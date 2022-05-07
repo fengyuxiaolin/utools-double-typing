@@ -64,7 +64,7 @@
         <el-button type="info" @click="rightPanel.typingEnd = false">ok</el-button>
       </span>
     </el-dialog>
-    <contextmenu :contextList='contextList' />
+    <contextmenu :contextList='contextList' v-if="contextList.length > 0" />
   </div>
 </template>
 
@@ -137,7 +137,6 @@ function initAllArticleList () {
 
 // 加载更多短文
 function loadMoreArticle () {
-  console.log('load: ', configPage.value.articles);
   let newArticleList = configPage.value.articles.slice(nowLoad, nowLoad + 5);
   allArticleList.value.push(...newArticleList);
   nowLoad = nowLoad + 5 > configPage.value.articles.length ? configPage.value.articles.length : 5;
@@ -271,7 +270,6 @@ function tabDown (e) {
   // 获取当前输入光标
   const cursor = e.target.selectionStart;
   // 如果光标下一位是标点， 则将光标向下移动一位
-  console.log('cursor: ', e.target.value.substring(cursor, cursor + 1));
   if (isPunctuation(e.target.value.substring(cursor, cursor + 1))) {
     e.target.selectionStart = cursor + 1;
   }
