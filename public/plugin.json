@@ -5,9 +5,6 @@
   "development": {
     "main": "http://127.0.0.1:3000"
   },
-  "platform": [
-    "win32"
-  ],
   "features": [
     {
       "code": "shungpin",
