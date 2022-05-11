@@ -73,7 +73,7 @@
       </el-col>
     </el-row>
   </div>
-  <contextmenu :contextList="contextList" v-if="contextList.length > 0" @selectItem="selectContext" />
+  <contextmenu :contextList="contextList" v-if="contextList.length > 0" />
 </template>
 
 <script setup>

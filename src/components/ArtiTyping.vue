@@ -72,6 +72,7 @@
 import { ref } from "vue";
 // 获取父组件传入的数据
 const props = defineProps(["configDb", "configPage"]);
+const emits = defineEmits(["addNewScheme"]);
 // 声明页面所需的变量
 let configDb = props.configDb, // 数据库
   configPage = ref(props.configPage), // 页面设置

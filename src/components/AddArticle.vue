@@ -30,8 +30,7 @@
           </el-col>
         </el-row>
       </el-form>
-      <contextmenu :contextList="contextList" v-if="contextList.length > 0" @selectItem="selectContext"
-        :offset='contextOffset' />
+      <contextmenu :contextList="contextList" v-if="contextList.length > 0" :offset='contextOffset' />
     </el-dialog>
   </div>
 </template>
