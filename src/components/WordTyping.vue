@@ -415,10 +415,24 @@ function enterAKey (keyMapValue) {
 // 检测单字输入
 function onWordTyping (val) {
   // 输入1个字母后判断声母, 矫正键位提示
-
-  if (val.length == 1 && val.toLowerCase != keyMapShengKey.key.toLowerCase) {
+  console.log('val: ', val.toLowerCase());
+  if (val.length == 1 && val.toLowerCase() != keyMapShengKey.key.toLowerCase()) {
     nowDoubleKeyList.forEach((sp) => {
       if (sp[0] == val) {
+        // 获取方案中该键位对应的声母
+        // 遍历方案
+        nowScheme.sheng.forEach((sheng, key) => {
+          if (key == val) {
+            // 遍历当前所有所有拼音
+            pinyinList.forEach((pinyin) => {
+              // 如果拼音中包含该声母
+              if (pinyin.indexOf(key) == 0) {
+                // 将该拼音设置为当前拼音
+                nowPinyin.value = pinyin;
+              }
+            })
+          }
+        });
         showKeysTip(sp);
       }
     });
