@@ -73,7 +73,6 @@
       </el-col>
     </el-row>
   </div>
-  <contextmenu :contextList="contextList" v-if="contextList.length > 0" />
 </template>
 
 <script setup>
@@ -90,7 +89,7 @@ let configDb, // utools数据库中的配置信息
   nowZeroScheme = ref({}), // 当前零声母方案
   keyboardMap = ref(), // 键位
   keyMapShengKey = {}, // 当前键位图提示声母
-  keyMapYunKey = {}, // 牵挂的键位图提示的韵母
+  keyMapYunKey = {}, // 键位图提示的韵母
   dict = ref(), // 文字
   pinyinList, // 当前文字的所有拼音
   nowPinyin = ref(), // 展示的拼音
@@ -116,7 +115,7 @@ zeroKeyArr = ZERO_KEY.flat();
 
 // 从父组件获取配置
 const props = defineProps(["configDb", "configPage"]);
-const emits = defineEmits(['addNewScheme'])
+const emits = defineEmits(['addNewScheme', 'changeContextList'])
 configDb = props.configDb;
 configPage = props.configPage;
 
@@ -206,6 +205,7 @@ function initContextMenu () {
       click: savePageSettings,
     }
   ];
+  emits('changeContextList', contextList.value);
 }
 
 // 初始化创建方案页面

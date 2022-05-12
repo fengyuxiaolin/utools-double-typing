@@ -76,7 +76,8 @@ window.compareVersion = (v1, v2) => {
     }
 }
 
-import { Plus } from "@element-plus/icons-vue";
+import { Plus, Menu } from "@element-plus/icons-vue";
 let app = createApp(App);
 app.component('Plus', Plus);
+app.component('Menu', Menu);
 app.mount('#app')

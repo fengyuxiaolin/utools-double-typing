@@ -13,7 +13,7 @@
         <el-tooltip content="添加短文">
           <el-button @click="addArticle" class="addArticleButton">
             <el-icon>
-              <plus class="plusIcon" />
+              <plus />
             </el-icon>
           </el-button>
         </el-tooltip>
@@ -32,8 +32,8 @@
       </li>
     </ul>
   </el-drawer>
-  <AddArticle :openAddArticle="openAddArticle" :configDb="configDb" :configPage="configPage"
-    :initArticle='initArticle' />
+  <AddArticle :openAddArticle="openAddArticle" :configDb="configDb" :configPage="configPage" :initArticle='initArticle'
+    @changeContextMenu='changeContextMenu' @initContextMenu='initContextMenu' />
   <!-- 页面显示当前短文 -->
   <div id="nowArticleBox">
     <!-- 上面显示原文 -->
@@ -64,7 +64,6 @@
         <el-button type="info" @click="rightPanel.typingEnd = false">ok</el-button>
       </span>
     </el-dialog>
-    <contextmenu :contextList='contextList' v-if="contextList.length > 0" />
   </div>
 </template>
 
@@ -72,7 +71,7 @@
 import { ref } from "vue";
 // 获取父组件传入的数据
 const props = defineProps(["configDb", "configPage"]);
-const emits = defineEmits(["addNewScheme"]);
+const emits = defineEmits(['addNewScheme', 'changeContextList']);
 // 声明页面所需的变量
 let configDb = props.configDb, // 数据库
   configPage = ref(props.configPage), // 页面设置
@@ -126,6 +125,8 @@ function initPage () {
   openAllArticleBox();
   // 初始短文列表，获取20条短文
   initAllArticleList();
+  // 初始化右键菜单
+  initContextMenu();
 }
 
 // 从页面设置中获取20条短文
@@ -318,6 +319,15 @@ function saveConfig () {
   updateUtoolsDB(configDb);
 }
 
+// 初始化右键菜单
+function initContextMenu () {
+  emits('changeContextList', contextList.value)
+}
+
+// 切换右键菜单
+function changeContextMenu (list) {
+  emits('changeContextList', list)
+}
 
 </script>
 

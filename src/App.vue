@@ -1,11 +1,12 @@
 <template>
   <el-header>
     <component :is="settings" :configDb="appConfigDb" :configPage="appConfigPage" @addNewScheme="createScheme"
-      @changePage="changePage"></component>
+      @changePage="changePage" @clickContextButton="openContextMenu"></component>
   </el-header>
   <transition name="slide-fade">
     <el-main>
-      <component :is="main" :configDb="configDb" :configPage="configPage" @addNewScheme="createScheme"></component>
+      <component :is="main" :configDb="configDb" :configPage="configPage" @changeContextList="changeContextList"
+        @addNewScheme="createScheme"></component>
     </el-main>
   </transition>
   <el-dialog v-model="addNewScheme" v-if="addNewScheme" title="自定义方案" width="720px" draggable>
@@ -14,6 +15,7 @@
     <span class="tips">tips:&nbsp;请为每个音节设置对应按键, 不设置会自动尝试绑定对应按键,
       不建议设置过于复杂的方案</span>
   </el-dialog>
+  <contextmenu :contextmenu="contextmenu" ref="contextmenu" />
 </template>
 
 <script>
@@ -28,6 +30,9 @@ export default {
       configPage: {},
       newSchemeConfig: {},
       addNewScheme: false,
+      contextmenu: {
+        contextList: []
+      }
     };
   },
   methods: {
@@ -53,6 +58,14 @@ export default {
       this.newSchemeConfig.settings.schemeName = "";
       this.addNewScheme = true;
     },
+    // 切换右键菜单内容
+    changeContextList (list) {
+      this.contextmenu.contextList = list;
+    },
+    // 打开右键菜单
+    openContextMenu (e) {
+      this.$refs['contextmenu'].openContextmenu(e);
+    }
   },
   computed: {
     appConfigDb () {
@@ -185,5 +198,12 @@ body {
   position: absolute;
   bottom: 4px;
   left: 10px;
+}
+.el-button.menuButton {
+  padding: 0;
+  border: 0;
+  margin-right: 36px;
+  float: right;
+  background-color: transparent;
 }
 </style>

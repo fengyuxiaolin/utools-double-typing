@@ -33,12 +33,21 @@
       <el-switch active-text="实时按键" v-model="configPage.settings.keyDownTipsSwitch" />
     </el-col>
   </el-row>
+  <el-button class="menuButton" @click="toOpenContextmenu">
+    <el-icon :size="18">
+      <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-ba633cb8="">
+        <path fill="currentColor"
+          d="M160 448a32 32 0 0 1-32-32V160.064a32 32 0 0 1 32-32h256a32 32 0 0 1 32 32V416a32 32 0 0 1-32 32H160zm448 0a32 32 0 0 1-32-32V160.064a32 32 0 0 1 32-32h255.936a32 32 0 0 1 32 32V416a32 32 0 0 1-32 32H608zM160 896a32 32 0 0 1-32-32V608a32 32 0 0 1 32-32h256a32 32 0 0 1 32 32v256a32 32 0 0 1-32 32H160zm448 0a32 32 0 0 1-32-32V608a32 32 0 0 1 32-32h255.936a32 32 0 0 1 32 32v256a32 32 0 0 1-32 32H608z">
+        </path>
+      </svg>
+    </el-icon>
+  </el-button>
 </template>
 
 <script setup>
 // 获取父组件传入的值
 const props = defineProps(["configDb", "configPage"]);
-const emit = defineEmits(["addNewScheme", "changePage"]);
+const emit = defineEmits(["addNewScheme", "changePage", "clickContextButton"]);
 
 const configPage = props.configPage, // 设置
   configDb = props.configDb, // 数据库
@@ -69,6 +78,11 @@ function typingWayChange () {
   ) {
     emit("changePage", "ArtiTyping");
   }
+}
+
+// 打开上下文菜单
+function toOpenContextmenu (e) {
+  emit('clickContextButton', e);
 }
 </script>
 

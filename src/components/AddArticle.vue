@@ -1,6 +1,6 @@
 <template>
   <div class="addArticleDialog">
-    <el-dialog v-bind="$attrs" @open="onOpen" @close="onClose" title="Dialog Titile" v-model="openAddArticle.open">
+    <el-dialog v-bind="$attrs" @open="onOpen" @close="onClose" title="添加短文" v-model="openAddArticle.open">
       <el-form ref="articleForm" :model="formData" :rules="rules" label-width="100px">
         <el-row>
           <el-form-item label="标题" prop="articleTitle">
@@ -30,7 +30,6 @@
           </el-col>
         </el-row>
       </el-form>
-      <contextmenu :contextList="contextList" v-if="contextList.length > 0" :offset='contextOffset' />
     </el-dialog>
   </div>
 </template>
@@ -40,6 +39,7 @@ export default {
   inheritAttrs: false,
   components: {},
   props: ['openAddArticle', 'configDb', 'configPage', 'initArticle'],
+  emits: ['changeContextMenu', 'initContextMenu'],
   data () {
     // 校验数据库是否存在该标题
     var checkArticleTitle = (rules, articleTitle, cb) => {
@@ -78,11 +78,7 @@ export default {
           label: '排版文本',
           click: this.textLayout
         }
-      ],
-      contextOffset: {
-        x: 0,
-        y: 0
-      }
+      ]
     }
   },
   computed: {},
@@ -91,12 +87,15 @@ export default {
   mounted () {
   },
   methods: {
-    onOpen () { },
+    onOpen () {
+      this.initContextmenu();
+    },
     onClose () {
       this.$refs['articleForm'].resetFields()
+      this.$emit('initContextMenu');
     },
     close () {
-      this.$props.openAddArticle.open = false
+      this.$props.openAddArticle.open = false;
     },
     handelConfirm () {
       this.$refs['articleForm'].validate(valid => {
@@ -117,6 +116,9 @@ export default {
     },
     textLayout () {
       this.formData.articleContent = correctText(this.formData.articleContent);
+    },
+    initContextmenu () {
+      this.$emit('changeContextMenu', this.contextList);
     }
   }
 }
