@@ -120,10 +120,13 @@ configDb = props.configDb;
 configPage = props.configPage;
 
 // 初始化页面
-if (configPage.settings.schemeName) {
-  initWordPage();
-} else {
-  initCreateSchemePage();
+initTypingPage();
+function initTypingPage () {
+  if (configPage.settings.schemeName && configPage.settings.typingWay == 'WordTyping') {
+    initWordPage();
+  } else {
+    initCreateSchemePage();
+  }
 }
 
 // 初始化单字练习页面
@@ -171,7 +174,7 @@ function initWordPage () {
           }
         }, 0);
         // 重新加载页面
-        initWordPage();
+        initTypingPage();
       }
     },
     { deep: true }
