@@ -446,4 +446,8 @@ ul {
   height: 296px;
   background-color: var(--rightPanelBackColor);
 }
+
+#nowArticleBox span {
+  white-space: pre-wrap;
+}
 </style>
