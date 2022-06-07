@@ -84,7 +84,7 @@ let configDb = props.configDb, // 数据库
   nowArticle = ref({ article: "", title: "", author: "" }), // 当前打开的短文
   rowHeight = 0, // 隐藏输入div的高度
   nowInputRow = 0, // 上一行的top值
-  originArticleBar = ref(null), // 原文滚动条
+  originArticleBar = ref(), // 原文滚动条
   canChangeRow = false, // 是否可换行按键
   rightPanel = ref({
     formData: {
@@ -115,7 +115,7 @@ let configDb = props.configDb, // 数据库
   ]),
   initArticle = { init: initAllArticleList }, // 添加后初始化短文
   nowTypingArticle = ref(""); // 当前输入的短文的文本
-
+let nowHei = ref(0)
 //初始化页面
 initPage();
 
@@ -236,7 +236,7 @@ function textAreaInput (e) {
   } else if (!canChangeRow || newDivHeight === rowHeight * nowInputRow) {
     return;
   } else {
-    originArticleBar.value.setScrollTop(newDivHeight - rowHeight * 2);
+    originArticleBar?.setScrollTop(newDivHeight - rowHeight * 2);
     newDivHeight > rowHeight * nowInputRow ? nowInputRow++ : nowInputRow--;
   }
 }
@@ -327,6 +327,18 @@ function initContextMenu () {
 // 切换右键菜单
 function changeContextMenu (list) {
   emits('changeContextList', list)
+}
+function randomArrNoRepeat (min, max, length) {
+  let arr = [];
+  for (let i = 0; i < length; i++) {
+    let num = Math.round(Math.random() * (max - min + 1) + min);
+    if (arr.indexOf(num) === -1) {
+      arr.push(num);
+    } else {
+      i--;
+    }
+  }
+  return arr;
 }
 
 </script>
