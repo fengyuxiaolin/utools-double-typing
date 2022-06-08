@@ -43,6 +43,7 @@ export default {
   data () {
     // 校验数据库是否存在该标题
     var checkArticleTitle = (rules, articleTitle, cb) => {
+      articleTitle = articleTitle.trim();
       for (let i of this.configDb.data.articles) {
         if (i.articleName === articleTitle) {
           cb(new Error('该短文已存在'));
@@ -101,12 +102,12 @@ export default {
       this.$refs['articleForm'].validate(valid => {
         if (!valid) return
         let articleDb = createArticle(this.formData);
-        this.$props.configDb.data.articles.push({
-          articleName: articleDb.data.title,
+        this.$props.configDb.data.articles.unshift({
+          articleName: articleDb.data.title.trim(),
           articleId: articleDb._id,
         })
         updateUtoolsDB(this.$props.configDb);
-        this.$props.configPage.articles.push({
+        this.$props.configPage.articles.unshift({
           articleName: articleDb.data.title,
           articleId: articleDb._id
         })

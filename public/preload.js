@@ -132,8 +132,8 @@ window.createArticle = ({ articleTitle, articleAuthor, articleContent }) => {
     let article = {
         _id: generateArticleId(),
         data: {
-            title: articleTitle,
-            author: articleAuthor,
+            title: articleTitle.trim(),
+            author: articleAuthor.trim(),
             article: articleContent
         }
     }
