@@ -14,7 +14,6 @@ window.putUtoolsDB = (data) => {
  */
 window.updateUtoolsDB = (data) => {
   const res = putUtoolsDB(data)
-  console.log('res: ', res)
   if (res.ok) {
     data._rev = res.rev
   }

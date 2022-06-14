@@ -61,7 +61,6 @@ function handelConfirm () {
         article: formData.value.articleContent
       }
     }
-    console.log('data: ', data);
     window.updateUtoolsDB(data);
     close();
   });
@@ -97,7 +96,7 @@ defineExpose({ openDialog, initFormData })
       <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
         <el-row>
           <el-form-item label="标题" prop="articleTitle">
-            <el-select v-model="formData.articleId" placeholder="请选择短文">
+            <el-select v-model="formData.articleId" placeholder="请选择短文" @change="initFormData">
               <el-option v-for="article in configPage.articles" :key="article" :label="article.articleName"
                 :value="article.articleId" />
             </el-select>

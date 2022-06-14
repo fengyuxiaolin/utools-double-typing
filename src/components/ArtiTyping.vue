@@ -409,7 +409,6 @@ function randomArrNoRepeat (min, max, length) {
 
 // 短文列表右击事件
 function liRightClick (article) {
-  console.log('article: ', article);
   checkedArticleId = article.articleId;
   checkedArticleName.value = article.articleName;
 }
@@ -419,9 +418,8 @@ function updateArticle (article_id) {
   if (article_id) {
     checkedArticleId = article_id;
   }
-  console.log('id: ', checkedArticleId);
-  updateArticleComp.openDialog();
-  updateArticleComp.initFormData(checkedArticleId);
+  updateArticleComp.value ? updateArticleComp.value.openDialog() : updateArticleComp.openDialog();
+  updateArticleComp.value ? updateArticleComp.value.initFormData(checkedArticleId) : updateArticleComp.initFormData(checkedArticleId);
 }
 
 // 关闭短文修改窗口事件

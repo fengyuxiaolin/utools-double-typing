@@ -418,7 +418,6 @@ function enterAKey (keyMapValue) {
 // 检测单字输入
 function onWordTyping (val) {
   // 输入1个字母后判断声母, 矫正键位提示
-  console.log('val: ', val.toLowerCase());
   if (val.length == 1 && val.toLowerCase() != keyMapShengKey.key.toLowerCase()) {
     nowDoubleKeyList.forEach((sp) => {
       if (sp[0] == val) {
