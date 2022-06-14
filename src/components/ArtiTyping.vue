@@ -420,8 +420,8 @@ function updateArticle (article_id) {
     checkedArticleId = article_id;
   }
   console.log('id: ', checkedArticleId);
-  updateArticleComp.value.openDialog();
-  updateArticleComp.value.initFormData(checkedArticleId);
+  updateArticleComp.openDialog();
+  updateArticleComp.initFormData(checkedArticleId);
 }
 
 // 关闭短文修改窗口事件
@@ -465,6 +465,16 @@ function delAndClose () {
   if (checkedArticleId === nowArticleId.value) {
     nowArticleId.value = '';
     nowArticle.value = { article: "", title: "", author: "" };
+    // 右侧面板
+    const rightPanelData = rightPanel.value.formData;
+    rightPanelData.title = nowArticle.value.title;
+    rightPanelData.author = nowArticle.value.author;
+    rightPanelData.speed = '0字/分';
+    rightPanelData.correct = '100%'
+    rightPanelData.timer = '00:00:00';
+    rightPanelData.schedule = '0%';
+    rightPanelData.backSeveral = 0;
+    rightPanelData.errSeveral = 0;
   }
 
   // 更新数据库
