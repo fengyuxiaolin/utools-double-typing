@@ -5,7 +5,7 @@
     <el-button @click="openAllArticleBox" class="littleButton"> > </el-button>
   </el-tooltip>
   <!-- 从左至右的抽屉显示所有短文 -->
-  <el-drawer v-model="allArticleBox" direction="ltr" :show-close="false">
+  <el-drawer v-model="allArticleBox" direction="ltr" :show-close="false" @closed="closeAllArticleBox">
     <!-- 自定义title -->
     <template #title>
       <div class="drawerTitle">
@@ -27,13 +27,31 @@
     </el-row>
     <!-- 一个简单无限滚动 -->
     <ul v-infinite-scroll="loadMoreArticle" id="allArticleList" :infinite-scroll-delay="300">
-      <li v-for="article in allArticleList" :key="article" @click="openArticle(article.articleId)">
+      <li v-for="article in allArticleList" :key="article" @click="openArticle(article.articleId)"
+        @contextmenu="liRightClick(article)">
         {{ article.articleName }}
       </li>
     </ul>
   </el-drawer>
+
   <AddArticle :openAddArticle="openAddArticle" :configDb="configDb" :configPage="configPage" :initArticle='initArticle'
     @changeContextMenu='changeContextMenu' @initContextMenu='initContextMenu' />
+  <UpdateArticle ref="updateArticleComp" :configPage='configPage' @changeContextMenu='changeContextMenu'
+    @updateDialogClosed='updateDialogClosed' />
+  <el-dialog v-model="delConfirm" title="确认删除" width="30%" draggable @closed="closeDel">
+    <span v-if="checkedArticleName">确认要删除短文《{{checkedArticleName}}》吗?</span>
+    <span v-else>未选择任何短文</span>
+    <template #footer>
+      <span class="dialog-footer" v-if="checkedArticleName">
+        <el-button @click="delConfirm = false">取消</el-button>
+        <el-button type="primary" @click="delAndClose">删除</el-button>
+      </span>
+      <span class="dialog-footer" v-else>
+        <el-button @click="delConfirm = false">取消</el-button>
+      </span>
+    </template>
+  </el-dialog>
+
   <!-- 页面显示当前短文 -->
   <div id="nowArticleBox">
     <!-- 上面显示原文 -->
@@ -82,6 +100,7 @@ let configDb = props.configDb, // 数据库
   nowLoad = 0, // 当前加载的短文数量
   nowArticleDb = ref({ id: '', data: '', _rev: '' }), // 当前短文数据库
   nowArticle = ref({ article: "", title: "", author: "" }), // 当前打开的短文
+  nowArticleId = ref(""), // 当前打开的短文id
   rowHeight = 0, // 隐藏输入div的高度
   nowInputRow = 0, // 上一行的top值
   originArticleBar = ref(), // 原文滚动条
@@ -109,12 +128,45 @@ let configDb = props.configDb, // 数据库
       }
     },
     {
+      label: '修改短文',
+      click: () => {
+        updateArticle(nowArticleId.value);
+      }
+    },
+    {
+      label: '删除短文',
+      click: () => {
+        delArticle(nowArticleId.value);
+      }
+    },
+    {
       label: '保存配置',
       click: saveConfig
     }
   ]),
+  atcContextList = ref([
+    {
+      label: '新建短文',
+      click: () => {
+        openAddArticle.value.open = true;
+      }
+    },
+    {
+      label: '修改短文',
+      click: updateArticle
+    },
+    {
+      label: '删除短文',
+      click: delArticle
+    }
+  ]),
+  initContextList = atcContextList.value,
+  checkedArticleId = '', // 当前右键点击的li的id
+  checkedArticleName = ref(''), // 当前右键点击的li的标题
   initArticle = { init: initAllArticleList }, // 添加后初始化短文
-  nowTypingArticle = ref(""); // 当前输入的短文的文本
+  nowTypingArticle = ref(""),
+  updateArticleComp = ref(),
+  delConfirm = ref(false); // 当前输入的短文的文本
 let nowHei = ref(0)
 //初始化页面
 initPage();
@@ -125,8 +177,6 @@ function initPage () {
   openAllArticleBox();
   // 初始短文列表，获取20条短文
   initAllArticleList();
-  // 初始化右键菜单
-  initContextMenu();
 }
 
 // 从页面设置中获取20条短文
@@ -141,7 +191,7 @@ function initAllArticleList () {
 function loadMoreArticle () {
   let newArticleList = configPage.value.articles.slice(nowLoad, nowLoad + 5);
   allArticleList.value.push(...newArticleList);
-  nowLoad = nowLoad + 5 > configPage.value.articles.length ? configPage.value.articles.length : 5;
+  nowLoad = nowLoad + 5 > configPage.value.articles.length ? configPage.value.articles.length : nowLoad + 5;
 }
 
 // 模糊搜索
@@ -191,8 +241,15 @@ function openArticle (articleId) {
   // 获取id为articleId的短文
   nowArticleDb.value = getDataById(articleId);
   nowArticle.value = nowArticleDb.value.data;
+
   // 关闭所有短文抽屉
   allArticleBox.value = false;
+  initContextList = contextList.value;
+  initContextMenu();
+
+  // 记录当前打开的短文id
+  nowArticleId.value = articleId;
+
   // 设置右侧面板信息
   const rightPanelData = rightPanel.value.formData;
   rightPanelData.title = nowArticle.value.title;
@@ -213,6 +270,15 @@ function openArticle (articleId) {
 
 // 打开左侧抽屉
 function openAllArticleBox () {
+  initContextList = atcContextList.value;
+  initContextMenu();
+  allArticleBox.value = true;
+}
+
+// 关闭左侧抽屉
+function closeAllArticleBox () {
+  initContextList = contextList.value;
+  initContextMenu();
   allArticleBox.value = true;
 }
 
@@ -321,7 +387,7 @@ function saveConfig () {
 
 // 初始化右键菜单
 function initContextMenu () {
-  emits('changeContextList', contextList.value)
+  changeContextMenu(initContextList)
 }
 
 // 切换右键菜单
@@ -341,6 +407,75 @@ function randomArrNoRepeat (min, max, length) {
   return arr;
 }
 
+// 短文列表右击事件
+function liRightClick (article) {
+  console.log('article: ', article);
+  checkedArticleId = article.articleId;
+  checkedArticleName.value = article.articleName;
+}
+
+// 修改短文
+function updateArticle (article_id) {
+  if (article_id) {
+    checkedArticleId = article_id;
+  }
+  console.log('id: ', checkedArticleId);
+  updateArticleComp.value.openDialog();
+  updateArticleComp.value.initFormData(checkedArticleId);
+}
+
+// 关闭短文修改窗口事件
+function updateDialogClosed () {
+  checkedArticleId = '';
+  checkedArticleName.value = '';
+  initContextMenu();
+  // 如果左侧抽屉是关闭的，则刷新所选短文
+  if (!allArticleBox.value && nowArticleId.value) {
+    openArticle(nowArticleId.value);
+  }
+}
+
+// 开始删除短文流程
+function delArticle (article_id) {
+  if (article_id) {
+    checkedArticleId = article_id;
+    checkedArticleName.value = nowArticle.value.title;
+  }
+  delConfirm.value = true;
+}
+
+// 关闭删除短文时移除当前选择信息
+function closeDel () {
+  checkedArticleId = '';
+  checkedArticleName.value = '';
+}
+
+// 确认删除短文
+function delAndClose () {
+  // 删除短文列表中短文
+  configDb.data.articles.splice(configDb.data.articles.findIndex(item => item.articleId === checkedArticleId), 1);
+  configPage.value.articles.splice(configPage.value.articles.findIndex(item => item.articleId === checkedArticleId), 1);
+  // 如果已查出, 则删除查出的短文, 并将查询下标减一
+  const listIndex = allArticleList.value.findIndex(item => item.articleId === checkedArticleId);
+  if (listIndex !== -1) {
+    allArticleList.value.splice(listIndex, 1);
+    nowLoad--;
+  }
+  // 如果是当前打开的短文，则清除当前打开的短文
+  if (checkedArticleId === nowArticleId.value) {
+    nowArticleId.value = '';
+    nowArticle.value = { article: "", title: "", author: "" };
+  }
+
+  // 更新数据库
+  window.updateUtoolsDB(configDb);
+
+  // 删除短文
+  window.removeDbById(checkedArticleId);
+
+  // 关闭确认框
+  delConfirm.value = false;
+}
 </script>
 
 <style scope>
