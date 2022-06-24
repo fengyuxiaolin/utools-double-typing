@@ -22,7 +22,7 @@
     <el-row>
       <el-col :span="24">
         <el-input v-model="searchArticleTitle" placeholder="搜索短文" @input="searchLikeArticle"
-          @keyup.enter="searchArticle"></el-input>
+          @keyup.enter="searchArticle" autofocus ref="searchInputRef"></el-input>
       </el-col>
     </el-row>
     <!-- 一个简单无限滚动 -->
@@ -166,7 +166,8 @@ let configDb = props.configDb, // 数据库
   initArticle = { init: initAllArticleList }, // 添加后初始化短文
   nowTypingArticle = ref(""),
   updateArticleComp = ref(),
-  delConfirm = ref(false); // 当前输入的短文的文本
+  delConfirm = ref(false), // 当前输入的短文的文本
+  searchInputRef = ref(); // 搜索输入框
 let nowHei = ref(0)
 //初始化页面
 initPage();
@@ -201,30 +202,42 @@ function searchLikeArticle (keyword) {
     return;
   }
   allArticleList.value = [];
+  // 先精确搜索, 并比对拼音首字母
+  foreachSearchArticle(keyword, true);
   // 外层遍历关键词
   for (let key of keyword) {
     // 内层遍历所有短文搜索
-    foreachSearchArticle(key);
+    foreachSearchArticle(key, false);
   }
 }
 
 // 搜索短文
 function searchArticle (e) {
   const keyword = e.target.value;
+  // 如果清空了搜索关键词，则重新初始化短文列表
   if (!keyword) {
     initAllArticleList();
     return;
   }
   allArticleList.value = [];
   // 遍历搜索
-  foreachSearchArticle(keyword);
+  foreachSearchArticle(keyword, true);
 }
 
 // 遍历搜索短文方法
-function foreachSearchArticle (keyword) {
+function foreachSearchArticle (keyword, comparePy) {
   for (let article of configPage.value.articles) {
-    if (article.articleName.indexOf(keyword) != -1 && allArticleList.value.indexOf(article) == -1) {
-      allArticleList.value.push(article);
+    if (allArticleList.value.indexOf(article) == -1) {
+      if (article.articleName.indexOf(keyword) != -1) {
+        allArticleList.value.push(article);
+      } else if (comparePy) {
+        // 获取标题拼音首字母(二维数组), 转为字符串无分隔符
+        let py = toPinyinFirst(article.articleName).join('');
+        console.log('py: ', py);
+        if (py.indexOf(keyword) != -1) {
+          allArticleList.value.push(article);
+        }
+      }
     }
   }
 }
@@ -272,6 +285,7 @@ function openArticle (articleId) {
 function openAllArticleBox () {
   initContextList = atcContextList.value;
   initContextMenu();
+  searchInputRef.focus ? searchInputRef.focus() : searchInputRef.value?.focus();
   allArticleBox.value = true;
 }
 
