@@ -68,7 +68,7 @@
     <!-- 下面显示文本域 -->
     <div id="typingArticle">
       <textarea class="textarea" type="text" v-model="nowTypingArticle" @input="textAreaInput" @keydown="canIChangeRow"
-        @keydown.tab="tabDown" @keydown.backspace="backspaceDown" />
+        @keydown.tab="tabDown" @keydown.backspace="backspaceDown" ref="textAreaRef" />
       <div class="textarea"></div>
     </div>
     <!-- 右侧面板, 记录数据 -->
@@ -167,7 +167,8 @@ let configDb = props.configDb, // 数据库
   nowTypingArticle = ref(""),
   updateArticleComp = ref(),
   delConfirm = ref(false), // 当前输入的短文的文本
-  searchInputRef = ref(); // 搜索输入框
+  textAreaRef = ref(), // 文本域的ref
+  searchInputRef = ref(); // 搜索输入框的ref
 let nowHei = ref(0)
 //初始化页面
 initPage();
@@ -247,6 +248,7 @@ function addArticle () {
   openAddArticle.value.open = true;
 }
 
+
 // 打开一篇短文
 function openArticle (articleId) {
   // 清空当前输入
@@ -294,6 +296,10 @@ function closeAllArticleBox () {
   initContextList = contextList.value;
   initContextMenu();
   allArticleBox.value = true;
+  // 聚焦文本域
+  if (nowArticle.value.article) {
+    textAreaRef.focus ? textAreaRef.focus() : textAreaRef.value.focus();
+  }
 }
 
 // 文本域输入事件
