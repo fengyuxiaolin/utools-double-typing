@@ -198,10 +198,12 @@ function loadMoreArticle () {
 
 // 模糊搜索
 function searchLikeArticle (keyword) {
+  // 如果清空了搜索关键词，则重新初始化短文列表
   if (!keyword) {
     initAllArticleList();
     return;
   }
+  keyword = keyword.toLowerCase();
   allArticleList.value = [];
   // 先精确搜索, 并比对拼音首字母
   foreachSearchArticle(keyword, true);
@@ -220,6 +222,7 @@ function searchArticle (e) {
     initAllArticleList();
     return;
   }
+  keyword = keyword.toLowerCase();
   allArticleList.value = [];
   // 遍历搜索
   foreachSearchArticle(keyword, true);
