@@ -79,7 +79,7 @@ function initFormData (article_id) {
       articleId: article._id,
       articleRev: article._rev,
       articleTitle: article.data.title,
-      articleAuthor: article.data.author.trim(),
+      articleAuthor: article.data.author?.trim(),
       articleContent: article.data.article
     }
   }

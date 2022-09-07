@@ -144,7 +144,7 @@ window.createArticle = ({ articleTitle, articleAuthor, articleContent }) => {
     _id: generateArticleId(),
     data: {
       title: articleTitle.trim(),
-      author: articleAuthor.trim(),
+      author: articleAuthor?.trim(),
       article: articleContent,
     },
   }
